@@ -21,7 +21,7 @@
     "start-dev": "nodemon --inspect server.js",
     "prestart-dev": "npm run lint",
     "migrations": "sequelize db:migrate",
-    "start": "babel-node --inspect server.js"
+    "start": "node --inspect server.js"
   },
   "cacheDirectories": [
     "node_modules"

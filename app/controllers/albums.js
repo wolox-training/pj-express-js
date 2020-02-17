@@ -1,29 +1,15 @@
 const albumsService = require('../services/albums');
 
-function albums(req, res) {
+exports.getAlbums = (req, res, next) =>
   albumsService
     .albums()
-    .then(albumsData => res.status(200).json({ status: 200, data: albumsData }))
-    .catch(error =>
-      res
-        .status(400)
-        .json({ status: 400, message: "Couldn't get albums from albums service", error: error.message })
-    );
-}
+    .then(albumsData => res.send({ data: albumsData }))
+    .catch(error => next(error));
 
-function albumPhotos(req, res) {
+exports.getAlbumPhotos = (req, res, next) =>
   albumsService
     .photos()
     .then(photos =>
-      res
-        .status(200)
-        .json({ status: 200, data: photos.filter(photo => photo.albumId === parseInt(req.params.id)) })
+      res.send.json({ data: photos.filter(photo => photo.albumId === parseInt(req.params.id)) })
     )
-    .catch(error =>
-      res
-        .status(400)
-        .json({ status: 400, message: "Couldn't get photos from albums service", error: error.message })
-    );
-}
-
-export { albums, albumPhotos };
+    .catch(error => next(error));

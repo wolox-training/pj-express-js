@@ -1,6 +1,6 @@
 const request = require('request-promise');
-const errors = require('errors.js');
-const logger = require('/logger/index.js');
+const errors = require('../errors');
+const logger = require('../logger/index.js');
 
 const options = {
   uri: process.env.ALBUMS_API_URL,
@@ -11,7 +11,7 @@ const options = {
 const get = data => {
   logger.info(`GET ${data}`);
   request(data).catch(error => {
-    errors.defaultError(error);
+    errors.apiError(error);
   });
 };
 
