@@ -1,27 +1,28 @@
 const request = require('request-promise');
+const errors = require('errors.js');
+const logger = require('/logger/index.js');
 
 const options = {
-  uri: 'https://jsonplaceholder.typicode.com',
+  uri: process.env.ALBUMS_API_URL,
   headers: { 'User-Agent': 'Request-Promise' },
   json: true
 };
 
-function get(data) {
-  return request(data).catch(error => {
-    console.log(error);
+const get = data => {
+  logger.info(`GET ${data}`);
+  request(data).catch(error => {
+    errors.defaultError(error);
   });
-}
+};
 
-function albums() {
+exports.albums = () => {
   const albumOptions = { ...options };
   albumOptions.uri = `${options.uri}/albums`;
   return get(albumOptions);
-}
+};
 
-function photos() {
+exports.photos = () => {
   const photoOptions = { ...options };
   photoOptions.uri = `${options.uri}/photos`;
   return get(photoOptions);
-}
-
-export { albums, photos };
+};
