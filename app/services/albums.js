@@ -1,5 +1,5 @@
 const request = require('axios');
-const logger = require('/logger');
+const logger = require('./logger');
 const errors = require('../errors');
 const config = require('./config');
 
@@ -11,14 +11,7 @@ const options = {
 
 const get = data => {
   logger.info(`GET ${data}`);
-  return request
-    .get(data)
-    .then(response => {
-      logger.info(response);
-    })
-    .catch(error => {
-      errors.externalApiError(error);
-    });
+  return request.get(data).catch(error => Promise.reject(errors.externalApiError(error)));
 };
 
 exports.albums = () => get({ ...options, uri: `${options.uri}/albums` });

@@ -49,3 +49,4 @@ node_modules
 .vscode/
 
 workspace-node-training.code-workspace
+.babelrc
