@@ -1,7 +1,7 @@
 const request = require('axios');
-const logger = require('./logger');
+const logger = require('../logger');
 const errors = require('../errors');
-const config = require('./config');
+const config = require('../../config');
 
 const options = {
   uri: config.common.api.albumsApiUrl,

@@ -7,7 +7,7 @@
     "npm": "6.4.1"
   },
   "scripts": {
-    "console": "babel-node console.js",
+    "console": "node console.js",
     "cover": "npm run test --coverage",
     "test": "NODE_ENV=testing jest --runInBand --forceExit --detectOpenHandles",
     "test-inspect": "NODE_ENV=testing node --inspect --debug-brk jest",
@@ -21,8 +21,7 @@
     "start-dev": "nodemon --inspect server.js",
     "prestart-dev": "npm run lint",
     "migrations": "sequelize db:migrate",
-    "start": "node server.js",
-    "server": "babel-node server.js"
+    "start": "node server.js"
   },
   "cacheDirectories": [
     "node_modules"
