@@ -1,28 +1,19 @@
-const request = require('request-promise');
+const request = require('axios');
+const logger = require('../logger');
 const errors = require('../errors');
-const logger = require('../logger/index.js');
+const config = require('../../config');
 
 const options = {
-  uri: process.env.ALBUMS_API_URL,
+  uri: config.common.api.albumsApiUrl,
   headers: { 'User-Agent': 'Request-Promise' },
   json: true
 };
 
 const get = data => {
   logger.info(`GET ${data}`);
-  request(data).catch(error => {
-    errors.apiError(error);
-  });
+  return request.get(data).catch(error => Promise.reject(errors.externalApiError(error)));
 };
 
-exports.albums = () => {
-  const albumOptions = { ...options };
-  albumOptions.uri = `${options.uri}/albums`;
-  return get(albumOptions);
-};
+exports.albums = () => get({ ...options, uri: `${options.uri}/albums` });
 
-exports.photos = () => {
-  const photoOptions = { ...options };
-  photoOptions.uri = `${options.uri}/photos`;
-  return get(photoOptions);
-};
+exports.photos = () => get({ ...options, uri: `${options.uri}/photos` });

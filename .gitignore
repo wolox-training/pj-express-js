@@ -47,3 +47,6 @@ node_modules
 
 # VS Code
 .vscode/
+
+workspace-node-training.code-workspace
+.babelrc
