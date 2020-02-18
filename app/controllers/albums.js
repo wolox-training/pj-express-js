@@ -7,4 +7,4 @@ exports.getAlbums = (req, res, next) =>
     .catch(error => next(error));
 
 exports.getAlbumPhotos = (req, res, next) =>
-  albumsService.getPhotos({ album_id: req.params.id }).catch(error => next(error));
+  albumsService.getPhotos({ albumId: req.params.id }).catch(error => next(error));
