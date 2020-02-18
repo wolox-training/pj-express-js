@@ -7,9 +7,4 @@ exports.getAlbums = (req, res, next) =>
     .catch(error => next(error));
 
 exports.getAlbumPhotos = (req, res, next) =>
-  albumsService
-    .photos()
-    .then(photos =>
-      res.send.json({ data: photos.filter(photo => photo.albumId === parseInt(req.params.id)) })
-    )
-    .catch(error => next(error));
+  albumsService.photos({ album_id: req.params.id }).catch(error => next(error));
