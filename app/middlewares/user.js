@@ -1,16 +1,14 @@
-const { check } = require('express-validator/check');
+const { check } = require('express-validator');
 
-export function createValidation() {
-  return [
-    check('firstName').exists(),
-    check('lastName').exists(),
-    check('password')
-      .exists()
-      .isLength({ min: 8 })
-      .isAlphanumeric(),
-    check('email')
-      .exists()
-      .isEmail()
-      .matches(new RegExp(`@wolox(${['\\.com\\.ar', 'co', '\\.cl', '\\.mx'].join('|')})$`))
-  ];
-}
+exports.createValidation = () => [
+  check('firstName').exists(),
+  check('lastName').exists(),
+  check('password')
+    .exists()
+    .isLength({ min: 8 })
+    .isAlphanumeric(),
+  check('email')
+    .exists()
+    .isEmail()
+    .matches(new RegExp(`@wolox(${['\\.com\\.ar', 'co', '\\.cl', '\\.mx'].join('|')})$`))
+];

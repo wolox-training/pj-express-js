@@ -1,7 +1,7 @@
 const { validationResult } = require('express-validator');
 const usersService = require('../services/users');
 
-function create(req, res, next) {
+exports.create = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return next(errors);
@@ -11,6 +11,4 @@ function create(req, res, next) {
     .createUser(req.body)
     .then(user => res.send(user))
     .catch(error => next(error));
-}
-
-export { create };
+};
