@@ -17,8 +17,6 @@ describe('Users Controller', () => {
             .send(body)
             .set('Accept', 'application/json')
             .then(res => {
-              console.log('El status es:');
-              console.log(body);
               expect(res.status).toBe(200);
               expect(res.body.mail).toBe(body.mail);
               done();
