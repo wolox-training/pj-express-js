@@ -17,3 +17,6 @@ exports.serverError = message => internalError(message, exports.EXTERNAL_API_ERR
 
 exports.INVALID_PARAMS = 'invalid_params';
 exports.invalidParams = message => internalError(message, exports.INVALID_PARAMS);
+
+exports.HASH_ERROR = 'hash_error';
+exports.hash_error = message => internalError(message, exports.HASH_ERROR);
