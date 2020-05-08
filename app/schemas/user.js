@@ -23,5 +23,3 @@ exports.create = {
     isEmail: true
   }
 };
-
-// new RegExp(`@wolox(${['\\.com\\.ar', 'co', '\\.cl', '\\.mx'].join('|')})$`))
