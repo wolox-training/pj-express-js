@@ -3,13 +3,17 @@ module.exports = {
     type: 'integer',
     example: 7
   },
-  username: {
+  firstName: {
     type: 'string',
-    example: 'tom99'
+    example: 'tom'
   },
-  userEmail: {
+  lastame: {
     type: 'string',
-    example: 'tom.engels@wolox.com.ar'
+    example: 'hanks'
+  },
+  mail: {
+    type: 'string',
+    example: 'tom.hanks@wolox.com.ar'
   },
   User: {
     type: 'object',
