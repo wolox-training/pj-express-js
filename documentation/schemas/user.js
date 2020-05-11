@@ -7,7 +7,7 @@ module.exports = {
     type: 'string',
     example: 'tom'
   },
-  lastame: {
+  lastName: {
     type: 'string',
     example: 'hanks'
   },
