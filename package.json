@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "description": "WTraining",
   "engines": {
-    "node": "10.14.1",
-    "npm": "6.4.1"
+    "node": "12.16.3",
+    "npm": "6.14.4"
   },
   "scripts": {
     "console": "node console.js",
