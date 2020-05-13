@@ -25,4 +25,24 @@ describe('Users Controller', () => {
       });
     });
   });
+
+  describe('/POST users/sessions', () => {
+    describe('when using valid parameters', () => {
+      it('should create a new session token', done => {
+        factory.create('User').then(user => {
+          request
+            .post('/api/v1/users/sessions')
+            .send({
+              mail: user.mail,
+              password: user.password
+            })
+            .set('Accept', 'application/json')
+            .then(res => {
+              expect(res.status).toBe(200);
+              done();
+            });
+        });
+      });
+    });
+  });
 });

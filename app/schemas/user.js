@@ -1,3 +1,5 @@
+const woloxMailRegexp = /.*@wolox(\.com\.ar|\.co|\.cl)$/;
+
 exports.create = {
   first_name: {
     in: ['body'],
@@ -24,4 +26,13 @@ exports.create = {
   }
 };
 
-// new RegExp(`@wolox(${['\\.com\\.ar', 'co', '\\.cl', '\\.mx'].join('|')})$`))
+exports.sessions = {
+  mail: {
+    in: ['body'],
+    exists: true,
+    isEmail: true,
+    custom: {
+      options: email => woloxMailRegexp.test(email)
+    }
+  }
+};

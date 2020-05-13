@@ -13,6 +13,11 @@ exports.init = app => {
     paramsValidator.validateSchemaAndFail(schemas.users.create),
     usersController.create
   );
+  app.post(
+    `${URL}/users/sessions`,
+    paramsValidator.validateSchemaAndFail(schemas.users.sessions),
+    usersController.sessions
+  );
   app.get(`${URL}/albums`, albumsController.getAlbums);
   app.get(`${URL}/albums/:id/photos`, albumsController.getAlbumPhotos);
 };

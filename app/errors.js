@@ -17,3 +17,7 @@ exports.serverError = message => internalError(message, exports.EXTERNAL_API_ERR
 
 exports.INVALID_PARAMS = 'invalid_params';
 exports.invalidParams = message => internalError(message, exports.INVALID_PARAMS);
+
+exports.AUTHENTICATION_ERROR = 'authentication_error';
+exports.authenticationError = () =>
+  internalError("The password and mail combination doesn't match", exports.AUTHENTICATION_ERROR);
