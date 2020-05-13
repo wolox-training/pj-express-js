@@ -21,3 +21,6 @@ exports.invalidParams = message => internalError(message, exports.INVALID_PARAMS
 exports.AUTHENTICATION_ERROR = 'authentication_error';
 exports.authenticationError = () =>
   internalError("The password and mail combination doesn't match", exports.AUTHENTICATION_ERROR);
+
+exports.HASH_ERROR = 'hash_error';
+exports.hash_error = message => internalError(message, exports.HASH_ERROR);

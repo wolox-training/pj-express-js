@@ -5,27 +5,13 @@ const logger = require('../logger');
 const { User } = require('../models');
 const config = require('../../config');
 
-const createParams = params =>
-  bcrypt
-    .genSalt(10)
-    .then(salt =>
-      bcrypt.hash(params.password, salt).then(password => ({
-        firstName: params.first_name,
-        lastName: params.last_name,
-        mail: params.mail,
-        password
-      }))
-    )
-    .catch(error => logger.error(error));
+exports.createUser = data => {
+  logger.info('Create User: ', data);
 
-exports.createUser = params => {
-  logger.info('Create User Params: ', params);
-
-  return createParams(params)
-    .then(sanitizedParams => User.create(sanitizedParams))
-    .catch(error => {
-      throw errors.databaseError(error.message);
-    });
+  return User.create(data).catch(error => {
+    logger.error(error);
+    throw errors.databaseError(error.message);
+  });
 };
 
 const validateHash = (user, hash) => bcrypt.compare(user.password, hash);
@@ -33,17 +19,21 @@ const authorizationToken = mail => jwt.encode({ mail }, config.common.api.jwtSec
 
 exports.createSession = params => {
   logger.info('Create Session:', params);
-
+  const response = {};
   return User.findOne({ where: { mail: params.mail } })
-    .then(user => validateHash(user, params.password))
+    .then(user => {
+      response.user_id = user.id;
+      return validateHash(user, params.password);
+    })
     .then(result => {
       if (result) {
-        return authorizationToken(params.mail);
+        response.authorization = authorizationToken(params.mail);
+        return response;
       }
       logger.error('Password and mail mismatch for user:', params.mail);
       throw errors.authenticationError();
     })
     .catch(error => {
-      throw errors.serverError(error.message);
+      throw errors.authenticationError(error.message);
     });
 };
