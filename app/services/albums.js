@@ -20,6 +20,8 @@ const queryString = queryParams => {
   return Object.keys(queryParams).length ? `?${querystring.stringify(queryParams)}` : '';
 };
 
-exports.getAlbums = (queryParams = {}) => get(`${options.uri}/albums${queryString(queryParams)}`).data;
+exports.getAlbums = (queryParams = {}) =>
+  get(`${options.uri}/albums${queryString(queryParams)}`).then(result => result.data);
 
-exports.getPhotos = (queryParams = {}) => get(`${options.uri}/photos${queryString(queryParams)}`).data;
+exports.getPhotos = (queryParams = {}) =>
+  get(`${options.uri}/photos${queryString(queryParams)}`).then(result => result.data);
