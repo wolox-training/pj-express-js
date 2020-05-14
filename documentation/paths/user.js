@@ -47,7 +47,7 @@ module.exports = {
             }
           }
         },
-        400: {
+        500: {
           description: 'Database error',
           content: {
             'application/json': {
