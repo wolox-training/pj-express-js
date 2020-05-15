@@ -27,7 +27,7 @@ exports.createSession = params => {
     })
     .then(result => {
       if (result) {
-        response.authorization = authorizationToken(params.mail);
+        response.token = authorizationToken(params.mail);
         return response;
       }
       logger.error('Password and mail mismatch for user:', params.mail);

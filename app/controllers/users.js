@@ -27,7 +27,7 @@ exports.sessions = (req, res, next) => {
   return usersService
     .createSession(req.body)
     .then(authorization => {
-      res.header({ Authorization: authorization });
+      res.header({ Authorization: authorization.token });
       res.send({ user_id: authorization.user_id });
     })
     .catch(error => next(error));
