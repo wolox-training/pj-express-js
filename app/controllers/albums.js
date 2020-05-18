@@ -8,6 +8,6 @@ exports.getAlbums = (req, res, next) =>
 
 exports.getAlbumPhotos = (req, res, next) =>
   albumsService
-    .getPhotos({ ...{ albumId: req.params.id }, ...req.query })
+    .getPhotos({ albumId: req.params.id, ...req.query })
     .then(photoData => res.send(photoData))
     .catch(error => next(error));
