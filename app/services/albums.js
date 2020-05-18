@@ -10,13 +10,18 @@ const options = {
   json: true
 };
 
-const get = data => {
-  logger.info(`GET ${data}`);
-  return request.get(data).catch(error => Promise.reject(errors.externalApiError(error)));
+const get = url => {
+  logger.info(`GET ${url}`);
+  return request.get(url).catch(error => Promise.reject(errors.externalApiError(error)));
+};
+
+const queryString = queryParams => {
+  logger.info(queryParams);
+  return Object.keys(queryParams).length ? `?${querystring.stringify(queryParams)}` : '';
 };
 
 exports.getAlbums = (queryParams = {}) =>
-  get({ ...options, uri: `${options.uri}/albums` }, querystring.stringify(queryParams));
+  get(`${options.uri}/albums${queryString(queryParams)}`).then(result => result.data);
 
 exports.getPhotos = (queryParams = {}) =>
-  get({ ...options, uri: `${options.uri}/photos` }, querystring.stringify(queryParams));
+  get(`${options.uri}/photos${queryString(queryParams)}`).then(result => result.data);

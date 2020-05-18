@@ -19,4 +19,4 @@ services:
 
 before_script:
   - psql -c "CREATE DATABASE bookstest;" -U postgres
-  - npm run migrations-test
+  - npm run migrations
