@@ -4,7 +4,7 @@ const axios = require('axios');
 const supertest = require('supertest');
 const { factory } = require('factory-girl');
 const app = require('../../app');
-const config = require('../../config');
+const { config } = require('../../config/testing');
 
 const request = supertest(app);
 const host = 'http://localhost';
