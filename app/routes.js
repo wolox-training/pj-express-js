@@ -1,5 +1,6 @@
 const albumsController = require('./controllers/albums');
 const usersController = require('./controllers/users');
+const adminsController = require('./controllers/admins');
 const { healthCheck } = require('./controllers/healthCheck');
 const paramsValidator = require('./middlewares/paramsValidator');
 const schemas = require('./schemas');
@@ -12,6 +13,11 @@ exports.init = app => {
     `${URL}/users`,
     paramsValidator.validateSchemaAndFail(schemas.users.create),
     usersController.create
+  );
+  app.post(
+    `${URL}/admin/users`,
+    paramsValidator.validateSchemaAndFail(schemas.admins.create),
+    adminsController.create
   );
   app.post(
     `${URL}/users/sessions`,
