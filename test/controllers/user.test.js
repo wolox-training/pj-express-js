@@ -110,7 +110,7 @@ describe('Users Controller', () => {
         });
       });
     });
-    describe('when user doesnt exist', () => {
+    describe("when user doesn't exist", () => {
       it('should not create a new session token', done => {
         factory.create('User', { password: 'QSShBtjP' }).then(() => {
           request
@@ -121,8 +121,8 @@ describe('Users Controller', () => {
             })
             .set('Accept', 'application/json')
             .then(res => {
-              expect(res.status).toBe(500);
-              expect(res.body.internal_code).toBe('authentication_error');
+              expect(res.status).toBe(404);
+              expect(res.body.internal_code).toBe('not_found');
               expect(res.headers.authorization).toBeUndefined();
               done();
             });

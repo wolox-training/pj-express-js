@@ -12,13 +12,10 @@ const options = {
 
 const get = url => {
   logger.info(`GET: ${url}`);
-  return request
-    .get(url)
-    .then(response => response)
-    .catch(error => {
-      logger.error(error);
-      return Promise.reject(errors.externalApiError(error));
-    });
+  return request.get(url).catch(error => {
+    logger.error(error);
+    return Promise.reject(errors.externalApiError(error));
+  });
 };
 
 const queryString = queryParams => {
