@@ -8,7 +8,8 @@ const statusCodes = {
   [errors.DEFAULT_ERROR]: 500,
   [errors.EXTERNAL_API_ERROR]: 503,
   [errors.SERVER_ERROR]: 500,
-  [errors.INVALID_PARAMS]: 422
+  [errors.INVALID_PARAMS]: 422,
+  [errors.NOT_FOUND]: 404
 };
 
 exports.handle = (error, req, res, next) => {

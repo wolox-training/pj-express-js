@@ -10,5 +10,5 @@ exports.crypt = hash =>
     .then(salt => bcrypt.hash(hash, salt))
     .catch(error => {
       logger.error(error);
-      throw errors.hash_error(error.message);
+      throw errors.hashError(error.message);
     });
