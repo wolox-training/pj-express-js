@@ -37,7 +37,7 @@ describe('Admin Controller', () => {
       });
     });
 
-    describe('when using invalid parameters', () => {
+    describe("when user doesn't exist", () => {
       it('should not create a new admin', done => {
         factory.create('User', { password: 'QSShBtjP', type: 'admin' }).then(user => {
           request
@@ -56,7 +56,7 @@ describe('Admin Controller', () => {
                   authorization: res.headers.authorization
                 })
                 .then(response => {
-                  expect(response.status).toBe(503);
+                  expect(response.status).toBe(404);
                   done();
                 });
             });
@@ -75,6 +75,33 @@ describe('Admin Controller', () => {
           .then(response => {
             expect(response.status).toBe(422);
             done();
+          });
+      });
+    });
+  });
+
+  describe("when user isn't an admin user", () => {
+    it('should not create a new admin', done => {
+      factory.create('User', { password: 'QSShBtjP', type: 'regular' }).then(user => {
+        request
+          .post('/api/v1/users/sessions')
+          .send({
+            mail: user.mail,
+            password: '$2b$10$G4b27Ilbv5Jmg8IrtWzjUuiY3zD2wvG9OuWlXEbg60F5Xy8s1Z12u'
+          })
+          .set('Accept', 'application/json')
+          .then(res => {
+            request
+              .post('/api/v1/admin/users')
+              .send({ user_id: user.id })
+              .set({
+                Accept: 'application/json',
+                authorization: res.headers.authorization
+              })
+              .then(response => {
+                expect(response.status).toBe(500);
+                done();
+              });
           });
       });
     });
