@@ -1,9 +1,8 @@
 const bcrypt = require('bcrypt');
-const jwt = require('jwt-simple');
 const errors = require('../errors');
 const logger = require('../logger');
 const { User } = require('../models');
-const config = require('../../config');
+const jwt = require('./jwt');
 
 exports.createUser = data => {
   logger.info('Create User: ', data);
@@ -15,7 +14,6 @@ exports.createUser = data => {
 };
 
 const validateHash = (user, hash) => bcrypt.compare(user.password, hash);
-const authorizationToken = mail => jwt.encode({ mail }, config.common.api.jwtSecret);
 
 exports.createSession = params => {
   logger.info('Create Session:', params);
@@ -27,11 +25,11 @@ exports.createSession = params => {
     })
     .then(result => {
       if (result) {
-        response.token = authorizationToken(params.mail);
+        response.token = jwt.authorizationToken(params.mail);
         return response;
       }
       logger.error('Password and mail mismatch for user:', params.mail);
-      throw errors.authenticationError();
+      throw errors.authenticationError("The password and mail combination doesn't match");
     })
     .catch(error => {
       throw errors.authenticationError(error.message);

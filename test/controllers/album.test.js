@@ -51,7 +51,7 @@ describe('Albums Controller', () => {
     });
 
     describe('when headers are missing', () => {
-      it('should respond with albums information', done => {
+      it('should not respond with albums information', done => {
         request
           .get('/api/v1/albums')
           .set({
@@ -61,6 +61,60 @@ describe('Albums Controller', () => {
             expect(response.status).toBe(422);
             done();
           });
+      });
+    });
+
+    describe('when the authorization token doesnt match the user', () => {
+      it('should respond with an error', done => {
+        factory.create('User', { password: 'QSShBtjP' }).then(user => {
+          request
+            .post('/api/v1/users/sessions')
+            .send({
+              mail: user.mail,
+              password: '$2b$10$G4b27Ilbv5Jmg8IrtWzjUuiY3zD2wvG9OuWlXEbg60F5Xy8s1Z12u'
+            })
+            .set('Accept', 'application/json')
+            .then(res => {
+              request
+                .get('/api/v1/albums')
+                .set({
+                  Accept: 'application/json',
+                  user_id: res.body.user_id,
+                  authorization: 'wrongToken'
+                })
+                .then(response => {
+                  expect(response.status).toBe(500);
+                  done();
+                });
+            });
+        });
+      });
+    });
+
+    describe("when the user doesn't exist", () => {
+      it('should respond with an error', done => {
+        factory.create('User', { password: 'QSShBtjP' }).then(user => {
+          request
+            .post('/api/v1/users/sessions')
+            .send({
+              mail: user.mail,
+              password: '$2b$10$G4b27Ilbv5Jmg8IrtWzjUuiY3zD2wvG9OuWlXEbg60F5Xy8s1Z12u'
+            })
+            .set('Accept', 'application/json')
+            .then(res => {
+              request
+                .get('/api/v1/albums')
+                .set({
+                  Accept: 'application/json',
+                  user_id: 0,
+                  authorization: res.headers.authorization
+                })
+                .then(response => {
+                  expect(response.status).toBe(404);
+                  done();
+                });
+            });
+        });
       });
     });
   });
@@ -112,6 +166,60 @@ describe('Albums Controller', () => {
           expect(response.status).toBe(422);
           done();
         });
+    });
+  });
+
+  describe('when the authorization token doesnt match the user', () => {
+    it('should respond with an error', done => {
+      factory.create('User', { password: 'QSShBtjP' }).then(user => {
+        request
+          .post('/api/v1/users/sessions')
+          .send({
+            mail: user.mail,
+            password: '$2b$10$G4b27Ilbv5Jmg8IrtWzjUuiY3zD2wvG9OuWlXEbg60F5Xy8s1Z12u'
+          })
+          .set('Accept', 'application/json')
+          .then(res => {
+            request
+              .get('/api/v1/albums/1/photos')
+              .set({
+                Accept: 'application/json',
+                user_id: res.body.user_id,
+                authorization: 'wrongToken'
+              })
+              .then(response => {
+                expect(response.status).toBe(500);
+                done();
+              });
+          });
+      });
+    });
+  });
+
+  describe("when the user doesn't exist", () => {
+    it('should respond with an error', done => {
+      factory.create('User', { password: 'QSShBtjP' }).then(user => {
+        request
+          .post('/api/v1/users/sessions')
+          .send({
+            mail: user.mail,
+            password: '$2b$10$G4b27Ilbv5Jmg8IrtWzjUuiY3zD2wvG9OuWlXEbg60F5Xy8s1Z12u'
+          })
+          .set('Accept', 'application/json')
+          .then(res => {
+            request
+              .get('/api/v1/albums/1/photos')
+              .set({
+                Accept: 'application/json',
+                user_id: 0,
+                authorization: res.headers.authorization
+              })
+              .then(response => {
+                expect(response.status).toBe(404);
+                done();
+              });
+          });
+      });
     });
   });
 });
