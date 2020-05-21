@@ -15,23 +15,16 @@ exports.createUser = data => {
 
 const validateHash = (user, hash) => bcrypt.compare(user.password, hash);
 
-exports.createSession = params => {
+exports.createSession = async params => {
   logger.info('Create Session:', params);
-  const response = {};
-  return User.findOne({ where: { mail: params.mail } })
-    .then(user => {
-      response.user_id = user.id;
-      return validateHash(user, params.password);
-    })
-    .then(result => {
-      if (result) {
-        response.token = jwt.authorizationToken(params.mail);
-        return response;
-      }
-      logger.error('Password and mail mismatch for user:', params.mail);
-      throw errors.authenticationError("The password and mail combination doesn't match");
-    })
-    .catch(error => {
-      throw errors.authenticationError(error.message);
-    });
+  const user = await User.findOne({ where: { mail: params.mail } });
+  if (!user) {
+    throw errors.notFound(`User ${params.mail} doesn't exist`);
+  }
+  const result = await validateHash(user.dataValues, params.password);
+  if (result) {
+    return { user_id: user.id, token: jwt.authorizationToken(params.mail) };
+  }
+  logger.error('Password and mail mismatch for user:', params.mail);
+  throw errors.authenticationError("The password and mail combination doesn't match");
 };

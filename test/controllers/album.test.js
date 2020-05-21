@@ -1,16 +1,9 @@
 const nock = require('nock');
-const httpAdapter = require('axios/lib/adapters/http');
-const axios = require('axios');
 const supertest = require('supertest');
-const { factory } = require('factory-girl');
 const app = require('../../app');
 const { config } = require('../../config/testing');
 
 const request = supertest(app);
-const host = 'http://localhost';
-
-axios.defaults.host = host;
-axios.defaults.adapter = httpAdapter;
 
 require('../factory/user');
 
@@ -18,35 +11,22 @@ describe('Albums Controller', () => {
   describe('/GET albums', () => {
     describe('when using valid parameters', () => {
       it('should respond with albums information', done => {
-        const scope = nock(config.common.api.albumsApiUrl)
+        nock(config.common.api.albumsApiUrl)
           .get('/albums')
-          // eslint-disable-next-line no-undef
-          .replyWithFile(200, `${appRoot}/test/mocks/albumsResponse.json`, {
+          .reply(200, '../mocks/albumsResponse.json', {
             'Content-Type': 'application/json'
           });
-        factory.create('User', { password: 'QSShBtjP' }).then(user => {
-          request
-            .post('/api/v1/users/sessions')
-            .send({
-              mail: user.mail,
-              password: '$2b$10$G4b27Ilbv5Jmg8IrtWzjUuiY3zD2wvG9OuWlXEbg60F5Xy8s1Z12u'
-            })
-            .set('Accept', 'application/json')
-            .then(res => {
-              request
-                .get('/api/v1/albums')
-                .set({
-                  Accept: 'application/json',
-                  user_id: res.body.user_id,
-                  authorization: res.headers.authorization
-                })
-                .then(response => {
-                  expect(response.status).toBe(200);
-                  scope.done();
-                  done();
-                });
-            });
-        });
+        request
+          .get('/api/v1/albums')
+          .set({
+            Accept: 'application/json',
+            authorization:
+              'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
+          })
+          .then(response => {
+            expect(response.status).toBe(200);
+            done();
+          });
       });
     });
 
@@ -66,55 +46,17 @@ describe('Albums Controller', () => {
 
     describe('when the authorization token doesnt match the user', () => {
       it('should respond with an error', done => {
-        factory.create('User', { password: 'QSShBtjP' }).then(user => {
-          request
-            .post('/api/v1/users/sessions')
-            .send({
-              mail: user.mail,
-              password: '$2b$10$G4b27Ilbv5Jmg8IrtWzjUuiY3zD2wvG9OuWlXEbg60F5Xy8s1Z12u'
-            })
-            .set('Accept', 'application/json')
-            .then(res => {
-              request
-                .get('/api/v1/albums')
-                .set({
-                  Accept: 'application/json',
-                  user_id: res.body.user_id,
-                  authorization: 'wrongToken'
-                })
-                .then(response => {
-                  expect(response.status).toBe(500);
-                  done();
-                });
-            });
-        });
-      });
-    });
-
-    describe("when the user doesn't exist", () => {
-      it('should respond with an error', done => {
-        factory.create('User', { password: 'QSShBtjP' }).then(user => {
-          request
-            .post('/api/v1/users/sessions')
-            .send({
-              mail: user.mail,
-              password: '$2b$10$G4b27Ilbv5Jmg8IrtWzjUuiY3zD2wvG9OuWlXEbg60F5Xy8s1Z12u'
-            })
-            .set('Accept', 'application/json')
-            .then(res => {
-              request
-                .get('/api/v1/albums')
-                .set({
-                  Accept: 'application/json',
-                  user_id: 0,
-                  authorization: res.headers.authorization
-                })
-                .then(response => {
-                  expect(response.status).toBe(404);
-                  done();
-                });
-            });
-        });
+        request
+          .get('/api/v1/albums')
+          .set({
+            Accept: 'application/json',
+            authorization:
+              'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcaaaa'
+          })
+          .then(response => {
+            expect(response.status).toBe(500);
+            done();
+          });
       });
     });
   });
@@ -122,35 +64,23 @@ describe('Albums Controller', () => {
   describe('/GET albums/:id/photos', () => {
     describe('when using valid parameters', () => {
       it('should respond with albums information', done => {
-        const scope = nock(config.common.api.albumsApiUrl)
+        nock(config.common.api.albumsApiUrl)
           .get('/photos?albumId=1')
           // eslint-disable-next-line no-undef
-          .replyWithFile(200, `${appRoot}/test/mocks/photosResponse.json`, {
+          .reply(200, '../mocks/albumsResponse.json', {
             'Content-Type': 'application/json'
           });
-        factory.create('User', { password: 'QSShBtjP' }).then(user => {
-          request
-            .post('/api/v1/users/sessions')
-            .send({
-              mail: user.mail,
-              password: '$2b$10$G4b27Ilbv5Jmg8IrtWzjUuiY3zD2wvG9OuWlXEbg60F5Xy8s1Z12u'
-            })
-            .set('Accept', 'application/json')
-            .then(res => {
-              request
-                .get('/api/v1/albums/1/photos')
-                .set({
-                  Accept: 'application/json',
-                  user_id: res.body.user_id,
-                  authorization: res.headers.authorization
-                })
-                .then(response => {
-                  expect(response.status).toBe(200);
-                  scope.done();
-                  done();
-                });
-            });
-        });
+        request
+          .get('/api/v1/albums/1/photos')
+          .set({
+            Accept: 'application/json',
+            authorization:
+              'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
+          })
+          .then(response => {
+            expect(response.status).toBe(200);
+            done();
+          });
       });
     });
   });
@@ -169,57 +99,19 @@ describe('Albums Controller', () => {
     });
   });
 
-  describe('when the authorization token doesnt match the user', () => {
+  describe("when the authorization token doesn't match the user", () => {
     it('should respond with an error', done => {
-      factory.create('User', { password: 'QSShBtjP' }).then(user => {
-        request
-          .post('/api/v1/users/sessions')
-          .send({
-            mail: user.mail,
-            password: '$2b$10$G4b27Ilbv5Jmg8IrtWzjUuiY3zD2wvG9OuWlXEbg60F5Xy8s1Z12u'
-          })
-          .set('Accept', 'application/json')
-          .then(res => {
-            request
-              .get('/api/v1/albums/1/photos')
-              .set({
-                Accept: 'application/json',
-                user_id: res.body.user_id,
-                authorization: 'wrongToken'
-              })
-              .then(response => {
-                expect(response.status).toBe(500);
-                done();
-              });
-          });
-      });
-    });
-  });
-
-  describe("when the user doesn't exist", () => {
-    it('should respond with an error', done => {
-      factory.create('User', { password: 'QSShBtjP' }).then(user => {
-        request
-          .post('/api/v1/users/sessions')
-          .send({
-            mail: user.mail,
-            password: '$2b$10$G4b27Ilbv5Jmg8IrtWzjUuiY3zD2wvG9OuWlXEbg60F5Xy8s1Z12u'
-          })
-          .set('Accept', 'application/json')
-          .then(res => {
-            request
-              .get('/api/v1/albums/1/photos')
-              .set({
-                Accept: 'application/json',
-                user_id: 0,
-                authorization: res.headers.authorization
-              })
-              .then(response => {
-                expect(response.status).toBe(404);
-                done();
-              });
-          });
-      });
+      request
+        .get('/api/v1/albums/1/photos')
+        .set({
+          Accept: 'application/json',
+          authorization:
+            'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQaaaaa'
+        })
+        .then(response => {
+          expect(response.status).toBe(500);
+          done();
+        });
     });
   });
 });

@@ -10,8 +10,8 @@ exports.config = {
       secret: 'some-super-secret'
     },
     api: {
-      albumsApiUrl: process.env.ALBUMS_API_URL || 'https://jsonplaceholder.typicode.com',
-      jwtSecret: process.env.JWT_SECRET || '4b5376ba96346ca953df19bf51819085'
+      albumsApiUrl: 'https://jsonplaceholder.typicode.com',
+      jwtSecret: '4b5376ba96346ca953df19bf51819085'
     }
   }
 };
