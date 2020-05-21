@@ -66,8 +66,7 @@ describe('Albums Controller', () => {
       it('should respond with albums information', done => {
         nock(config.common.api.albumsApiUrl)
           .get('/photos?albumId=1')
-          // eslint-disable-next-line no-undef
-          .reply(200, '../mocks/albumsResponse.json', {
+          .reply(200, '../mocks/photosResponse.json', {
             'Content-Type': 'application/json'
           });
         request

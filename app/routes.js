@@ -3,7 +3,7 @@ const usersController = require('./controllers/users');
 const { healthCheck } = require('./controllers/healthCheck');
 const paramsValidator = require('./middlewares/paramsValidator');
 const schemas = require('./schemas');
-const authorizationValidator = require('../app/middlewares/authorizationValidator');
+const authorizationValidator = require('./middlewares/authorizationValidator');
 
 const URL = '/api/v1';
 
