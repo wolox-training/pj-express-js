@@ -19,3 +19,9 @@ exports.sessions = (req, res, next) =>
       res.send({ user_id: authorization.user_id });
     })
     .catch(error => next(error));
+
+exports.index = (req, res, next) =>
+  usersService
+    .index(req)
+    .then(users => res.send(users))
+    .catch(error => next(error));

@@ -150,4 +150,67 @@ describe('Users Controller', () => {
       });
     });
   });
+  describe('/GET users', () => {
+    describe('when using an admin user authentication', () => {
+      it('should list all users', done => {
+        factory.createMany('User', 5).then(() => {
+          factory.create('User', { mail: 'pedro.jara@wolox.com.ar', type: 'admin' }).then(() => {
+            request
+              .get('/api/v1/users')
+              .set({
+                Accept: 'application/json',
+                authorization:
+                  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
+              })
+              .then(res => {
+                expect(res.status).toBe(200);
+                expect(res.body.count).toBe(6);
+                expect(res.body.page).toBe(0);
+                done();
+              });
+          });
+        });
+      });
+    });
+
+    describe('when using an regular user authentication', () => {
+      it('should list only regular users', done => {
+        factory.createMany('User', 5, { type: 'admin' }).then(() => {
+          factory.create('User', { mail: 'pedro.jara@wolox.com.ar', type: 'regular' }).then(() => {
+            request
+              .get('/api/v1/users')
+              .set({
+                Accept: 'application/json',
+                authorization:
+                  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
+              })
+              .then(res => {
+                expect(res.status).toBe(200);
+                expect(res.body.count).toBe(1);
+                expect(res.body.page).toBe(0);
+                done();
+              });
+          });
+        });
+      });
+    });
+
+    describe('when authentication header is missing', () => {
+      it('should not list users', done => {
+        factory.createMany('User', 5, { type: 'admin' }).then(() => {
+          factory.create('User', { mail: 'pedro.jara@wolox.com.ar', type: 'regular' }).then(() => {
+            request
+              .get('/api/v1/users')
+              .set({
+                Accept: 'application/json'
+              })
+              .then(res => {
+                expect(res.status).toBe(422);
+                done();
+              });
+          });
+        });
+      });
+    });
+  });
 });
