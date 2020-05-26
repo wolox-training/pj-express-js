@@ -1,3 +1,4 @@
+const nock = require('nock');
 const models = require('../app/models');
 
 const tables = Object.values(models.sequelize.models);
@@ -8,5 +9,7 @@ const truncateTable = model =>
 const truncateDatabase = () => Promise.all(tables.map(truncateTable));
 
 global.beforeEach(async () => {
+  nock.cleanAll();
+  nock.restore();
   await truncateDatabase();
 });
