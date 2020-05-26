@@ -11,7 +11,7 @@ describe('Albums Controller', () => {
   describe('/GET albums', () => {
     describe('when using valid parameters', () => {
       it('should respond with albums information', done => {
-        nock(config.common.api.albumsApiUrl)
+        const scope = nock(config.common.api.albumsApiUrl)
           .get('/albums')
           .reply(200, '../mocks/albumsResponse.json', {
             'Content-Type': 'application/json'
@@ -25,6 +25,7 @@ describe('Albums Controller', () => {
           })
           .then(response => {
             expect(response.status).toBe(200);
+            scope.done();
             done();
           });
       });
@@ -63,8 +64,8 @@ describe('Albums Controller', () => {
 
   describe('/GET albums/:id/photos', () => {
     describe('when using valid parameters', () => {
-      it('should respond with albums information', done => {
-        nock(config.common.api.albumsApiUrl)
+      it('should respond with photos information', done => {
+        const scope = nock(config.common.api.albumsApiUrl)
           .get('/photos?albumId=1')
           .reply(200, '../mocks/photosResponse.json', {
             'Content-Type': 'application/json'
@@ -78,6 +79,7 @@ describe('Albums Controller', () => {
           })
           .then(response => {
             expect(response.status).toBe(200);
+            scope.done();
             done();
           });
       });
