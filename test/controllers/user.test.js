@@ -6,7 +6,7 @@ const app = require('../../app');
 
 const request = supertest(app);
 
-require('../factory/user');
+require('../factory/models');
 
 describe('Users Controller', () => {
   describe('/POST users', () => {
