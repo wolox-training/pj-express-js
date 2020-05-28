@@ -1,6 +1,8 @@
 const supertest = require('supertest');
 const { factory } = require('factory-girl');
+const nock = require('nock');
 const converter = require('../helpers/converter');
+const { config } = require('../../config/testing');
 
 const app = require('../../app');
 
@@ -210,6 +212,64 @@ describe('Users Controller', () => {
               });
           });
         });
+      });
+    });
+  });
+
+  describe('/GET users/:id/albums', () => {
+    describe('when using valid params', () => {
+      it("should list all user's albums", done => {
+        nock(config.common.api.albumsApiUrl)
+          .get('/albums?id=2')
+          .replyWithFile(200, `${process.cwd()}/test/mocks/limitedAlbumsResponse.json`, {
+            'Content-Type': 'application/json'
+          });
+        factory.create('User', { mail: 'pedro.jara@wolox.com.ar' }).then(user => {
+          factory.create('UserAlbum', { userId: user.id, albumId: 2 }).then(() => {
+            request
+              .get(`/api/v1/users/${user.id}/albums`)
+              .set({
+                Accept: 'application/json',
+                authorization:
+                  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
+              })
+              .then(res => {
+                expect(res.status).toBe(200);
+                expect(res.body[0].id).toBe(2);
+                done();
+              });
+          });
+        });
+      });
+    });
+
+    describe("when user doesn't exist", () => {
+      it('should return status 404', done => {
+        request
+          .get('/api/v1/users/1/albums')
+          .set({
+            Accept: 'application/json',
+            authorization:
+              'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
+          })
+          .then(res => {
+            expect(res.status).toBe(404);
+            done();
+          });
+      });
+    });
+
+    describe('when there is no authorization header', () => {
+      it('should return status 422', done => {
+        request
+          .get('/api/v1/users/1/albums')
+          .set({
+            Accept: 'application/json'
+          })
+          .then(res => {
+            expect(res.status).toBe(422);
+            done();
+          });
       });
     });
   });

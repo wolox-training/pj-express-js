@@ -17,6 +17,11 @@ exports.init = app => {
     usersController.create
   );
   app.get(
+    `${URL}/users/:id/albums`,
+    [paramsValidator.validateSchemaAndFail(schemas.users.indexUserAlbums), authorizationValidator.validate],
+    usersController.indexUserAlbums
+  );
+  app.get(
     `${URL}/users`,
     [paramsValidator.validateSchemaAndFail(schemas.users.index), authorizationValidator.validate],
     usersController.index

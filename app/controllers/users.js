@@ -25,3 +25,9 @@ exports.index = (req, res, next) =>
     .index(req)
     .then(users => res.send(users))
     .catch(error => next(error));
+
+exports.indexUserAlbums = (req, res, next) =>
+  usersService
+    .indexUserAlbums(req.params.id)
+    .then(users => res.send(users))
+    .catch(error => next(error));

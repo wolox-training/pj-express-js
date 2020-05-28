@@ -1,9 +1,10 @@
 const bcrypt = require('bcrypt');
 const errors = require('../errors');
 const logger = require('../logger');
-const { User } = require('../models');
+const { User, UserAlbum } = require('../models');
 const jwt = require('./jwt');
 const config = require('../../config');
+const albumsService = require('../services/albums');
 
 exports.createUser = data => {
   logger.info('Create User: ', data);
@@ -31,12 +32,12 @@ exports.createSession = async params => {
 };
 
 exports.index = async req => {
-  logger.info('Index Users with: ', req);
   const page = req.headers.page || 0;
   const type =
     (await jwt.findUserByToken(req.headers.authorization)).type === 'regular'
       ? 'regular'
       : ['admin', 'regular'];
+  logger.info('Index Users with type: ', type);
   const { count, rows } = await User.findAndCountAll({
     where: {
       type
@@ -45,4 +46,13 @@ exports.index = async req => {
     limit: config.common.api.paginationLimit
   });
   return { users: rows, count, page };
+};
+
+exports.indexUserAlbums = async userId => {
+  logger.info(`Index User ${userId} Albums`);
+  const user = await User.findByPk(userId);
+  if (!user) throw errors.notFound(`User with Id ${userId} not found`);
+  const userAlbums = await UserAlbum.findAll({ where: { userId } });
+  const albums = await albumsService.getAlbums({ id: userAlbums.map(ua => ua.albumId) });
+  return albums;
 };

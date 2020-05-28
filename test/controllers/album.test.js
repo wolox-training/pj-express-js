@@ -67,7 +67,7 @@ describe('Albums Controller', () => {
       it('should respond with photos information', done => {
         nock(config.common.api.albumsApiUrl)
           .get('/photos?albumId=1')
-          .reply(200, '../mocks/photosResponse.json', {
+          .replyWithFile(200, `${process.cwd()}/test/mocks/photosResponse.json`, {
             'Content-Type': 'application/json'
           });
         request
