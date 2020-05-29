@@ -28,3 +28,5 @@ exports.createSession = async params => {
   logger.error('Password and mail mismatch for user:', params.mail);
   throw errors.authenticationError("The password and mail combination doesn't match");
 };
+
+exports.findUserByMail = mail => User.findOne({ where: { mail } });

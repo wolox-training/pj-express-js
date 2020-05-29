@@ -18,12 +18,7 @@ exports.init = app => {
   );
   app.post(
     `${URL}/admin/users`,
-    [
-      paramsValidator.validateSchemaAndFail(schemas.admins.create),
-      adminValidator.create,
-      adminValidator.validateAdmin,
-      authorizationValidator.validate
-    ],
+    [paramsValidator.validateSchemaAndFail(schemas.admins.create), adminValidator.validateAdmin],
     adminsController.create
   );
   app.post(
