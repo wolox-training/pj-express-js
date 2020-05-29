@@ -12,5 +12,13 @@ describe('JWT Service', () => {
         done();
       });
     });
+
+    describe("when expiry time hasn't passed", () => {
+      it('the token should be valid', done => {
+        const token = jwt.authorizationToken('pedro.jara@wolox.com.ar');
+        expect(jwt.validate(token)).toBeDefined();
+        done();
+      });
+    });
   });
 });
