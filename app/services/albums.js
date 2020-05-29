@@ -11,8 +11,11 @@ const options = {
 };
 
 const get = url => {
-  logger.info(`GET ${url}`);
-  return request.get(url).catch(error => Promise.reject(errors.externalApiError(error)));
+  logger.info(`GET: ${url}`);
+  return request.get(url).catch(error => {
+    logger.error(error);
+    return Promise.reject(errors.externalApiError(error));
+  });
 };
 
 const queryString = queryParams => {
@@ -21,7 +24,7 @@ const queryString = queryParams => {
 };
 
 exports.getAlbums = (queryParams = {}) =>
-  get(`${options.uri}/albums${queryString(queryParams)}`).then(result => result.data);
+  get(`${options.uri}/albums${queryString(queryParams)}`).then(response => response.data);
 
 exports.getPhotos = (queryParams = {}) =>
-  get(`${options.uri}/photos${queryString(queryParams)}`).then(result => result.data);
+  get(`${options.uri}/photos${queryString(queryParams)}`).then(response => response.data);

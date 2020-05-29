@@ -18,5 +18,11 @@ exports.serverError = message => internalError(message, exports.EXTERNAL_API_ERR
 exports.INVALID_PARAMS = 'invalid_params';
 exports.invalidParams = message => internalError(message, exports.INVALID_PARAMS);
 
+exports.AUTHENTICATION_ERROR = 'authentication_error';
+exports.authenticationError = message => internalError(message, exports.AUTHENTICATION_ERROR);
+
 exports.HASH_ERROR = 'hash_error';
-exports.hash_error = message => internalError(message, exports.HASH_ERROR);
+exports.hashError = message => internalError(message, exports.HASH_ERROR);
+
+exports.NOT_FOUND = 'not_found';
+exports.notFound = message => internalError(message, exports.NOT_FOUND);

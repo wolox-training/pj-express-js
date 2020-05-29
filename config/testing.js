@@ -8,6 +8,10 @@ exports.config = {
 
     session: {
       secret: 'some-super-secret'
+    },
+    api: {
+      albumsApiUrl: 'https://jsonplaceholder.typicode.com',
+      jwtSecret: '4b5376ba96346ca953df19bf51819085'
     }
   }
 };

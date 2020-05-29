@@ -69,4 +69,85 @@ describe('Users Controller', () => {
       });
     });
   });
+
+  describe('/POST users/sessions', () => {
+    describe('when using valid parameters', () => {
+      it('should create a new session token', done => {
+        factory.create('User', { password: 'QSShBtjP' }).then(user => {
+          request
+            .post('/api/v1/users/sessions')
+            .send({
+              mail: user.mail,
+              password: '$2b$10$G4b27Ilbv5Jmg8IrtWzjUuiY3zD2wvG9OuWlXEbg60F5Xy8s1Z12u'
+            })
+            .set('Accept', 'application/json')
+            .then(res => {
+              expect(res.status).toBe(200);
+              expect(res.body.user_id).toBe(user.id);
+              expect(res.headers.authorization).toBeDefined();
+              done();
+            });
+        });
+      });
+    });
+
+    describe('when using invalid password', () => {
+      it('should not create a new session token', done => {
+        factory.create('User', { password: 'pSShBtjP' }).then(user => {
+          request
+            .post('/api/v1/users/sessions')
+            .send({
+              mail: user.mail,
+              password: '$2b$10$G4b27Ilbv5Jmg8IrtWzjUuiY3zD2wvG9OuWlXEbg60F5Xy8s1Z12u'
+            })
+            .set('Accept', 'application/json')
+            .then(res => {
+              expect(res.status).toBe(500);
+              expect(res.body.internal_code).toBe('authentication_error');
+              expect(res.headers.authorization).toBeUndefined();
+              done();
+            });
+        });
+      });
+    });
+    describe("when user doesn't exist", () => {
+      it('should not create a new session token', done => {
+        factory.create('User', { password: 'QSShBtjP' }).then(() => {
+          request
+            .post('/api/v1/users/sessions')
+            .send({
+              mail: 'pepe@wolox.com.ar',
+              password: '$2b$10$G4b27Ilbv5Jmg8IrtWzjUuiY3zD2wvG9OuWlXEbg60F5Xy8s1Z12u'
+            })
+            .set('Accept', 'application/json')
+            .then(res => {
+              expect(res.status).toBe(404);
+              expect(res.body.internal_code).toBe('not_found');
+              expect(res.headers.authorization).toBeUndefined();
+              done();
+            });
+        });
+      });
+    });
+
+    describe('when using invalid parameters', () => {
+      it('should create a new session token', done => {
+        factory.create('User', { password: 'QSShBtjP' }).then(() => {
+          request
+            .post('/api/v1/users/sessions')
+            .send({
+              mail: 'hi',
+              password: '$2b$10$G4b27Ilbv5Jmg8IrtWzjUuiY3zD2wvG9OuWlXEbg60F5Xy8s1Z12u'
+            })
+            .set('Accept', 'application/json')
+            .then(res => {
+              expect(res.status).toBe(422);
+              expect(res.body.internal_code).toBe('invalid_params');
+              expect(res.headers.authorization).toBeUndefined();
+              done();
+            });
+        });
+      });
+    });
+  });
 });

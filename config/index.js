@@ -34,7 +34,8 @@ const config = {
       bodySizeLimit: process.env.API_BODY_SIZE_LIMIT,
       parameterLimit: process.env.API_PARAMETER_LIMIT,
       port: process.env.PORT,
-      albumsApiUrl: process.env.ALBUMS_API_URL
+      albumsApiUrl: process.env.ALBUMS_API_URL,
+      jwtSecret: process.env.JWT_SECRET
     },
     session: {
       header_name: 'authorization',
