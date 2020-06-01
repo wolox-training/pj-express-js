@@ -20,8 +20,8 @@ exports.sessions = (req, res, next) =>
     })
     .catch(error => next(error));
 
-exports.index = (req, res, next) =>
+exports.getUsers = (req, res, next) =>
   usersService
-    .index(req)
+    .getUsers(req)
     .then(users => res.send(users))
     .catch(error => next(error));

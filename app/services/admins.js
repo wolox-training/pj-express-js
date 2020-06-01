@@ -5,12 +5,8 @@ const { User } = require('../models');
 exports.createAdmin = data => {
   logger.info('Create Admin: ', data);
 
-  return User.findByPk(data.user_id)
-    .then(user => {
-      user.type = 'admin';
-      user.save();
-      return user.dataValues;
-    })
+  return User.upsert(data, { returning: true })
+    .then(result => result[0])
     .catch(error => {
       logger.error(error);
       throw errors.databaseError(error.message);

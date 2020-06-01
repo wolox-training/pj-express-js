@@ -1,12 +1,30 @@
 exports.create = {
-  user_id: {
+  first_name: {
     in: ['body'],
     exists: true,
-    errorMessage: 'user_id is mandatory'
+    errorMessage: 'first_name is mandatory'
+  },
+  last_name: {
+    in: ['body'],
+    exists: true,
+    errorMessage: 'last_name is mandatory'
+  },
+  password: {
+    in: ['body'],
+    exists: true,
+    isLength: {
+      options: { min: 8 }
+    },
+    isAlphanumeric: true
+  },
+  mail: {
+    in: ['body'],
+    exists: true,
+    isEmail: true
   },
   authorization: {
     in: ['headers'],
     exists: true,
-    errorMessage: 'authorization is mandatory'
+    errorMessage: 'authorization headers is mandatory'
   }
 };

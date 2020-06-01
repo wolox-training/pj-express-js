@@ -1,6 +1,7 @@
 const supertest = require('supertest');
 const { factory } = require('factory-girl');
 const converter = require('../helpers/converter');
+const authorizationToken = require('../helpers/authorizationTokens');
 
 const app = require('../../app');
 
@@ -102,7 +103,7 @@ describe('Users Controller', () => {
             })
             .set('Accept', 'application/json')
             .then(res => {
-              expect(res.status).toBe(500);
+              expect(res.status).toBe(403);
               expect(res.body.internal_code).toBe('authentication_error');
               expect(res.headers.authorization).toBeUndefined();
               done();
@@ -159,8 +160,7 @@ describe('Users Controller', () => {
               .get('/api/v1/users')
               .set({
                 Accept: 'application/json',
-                authorization:
-                  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
+                authorization: authorizationToken.adminToken
               })
               .then(res => {
                 expect(res.status).toBe(200);
@@ -181,8 +181,7 @@ describe('Users Controller', () => {
               .get('/api/v1/users')
               .set({
                 Accept: 'application/json',
-                authorization:
-                  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
+                authorization: authorizationToken.regularToken
               })
               .then(res => {
                 expect(res.status).toBe(200);

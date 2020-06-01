@@ -24,25 +24,32 @@ exports.createSession = async params => {
   }
   const result = await validateHash(user.dataValues, params.password);
   if (result) {
-    return { user_id: user.id, token: jwt.authorizationToken(params.mail) };
+    return {
+      user_id: user.id,
+      token: jwt.authorizationToken(user)
+    };
   }
   logger.error('Password and mail mismatch for user:', params.mail);
   throw errors.authenticationError("The password and mail combination doesn't match");
 };
 
-exports.index = async req => {
-  logger.info('Index Users with: ', req);
-  const page = req.headers.page || 0;
-  const type =
-    (await jwt.findUserByToken(req.headers.authorization)).type === 'regular'
-      ? 'regular'
-      : ['admin', 'regular'];
-  const { count, rows } = await User.findAndCountAll({
-    where: {
-      type
-    },
-    offset: page,
-    limit: config.common.api.paginationLimit
-  });
-  return { users: rows, count, page };
+exports.getUsers = async req => {
+  try {
+    const page = req.headers.page || 0;
+    const limit = req.headers.limit || config.common.api.paginationLimit;
+    const type =
+      jwt.validate(req.headers.authorization).type === 'regular' ? 'regular' : ['admin', 'regular'];
+    const { count, rows } = await User.findAndCountAll({
+      where: {
+        type
+      },
+      offset: page,
+      limit
+    });
+    return { users: rows, count, page };
+  } catch (err) {
+    throw errors.databaseError(err);
+  }
 };
+
+exports.findUserByMail = mail => User.findOne({ where: { mail } });

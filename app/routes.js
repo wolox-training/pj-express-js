@@ -19,16 +19,11 @@ exports.init = app => {
   app.get(
     `${URL}/users`,
     [paramsValidator.validateSchemaAndFail(schemas.users.index), authorizationValidator.validate],
-    usersController.index
+    usersController.getUsers
   );
   app.post(
     `${URL}/admin/users`,
-    [
-      paramsValidator.validateSchemaAndFail(schemas.admins.create),
-      adminValidator.create,
-      adminValidator.validateAdmin,
-      authorizationValidator.validate
-    ],
+    [paramsValidator.validateSchemaAndFail(schemas.admins.create), adminValidator.validateAdmin],
     adminsController.create
   );
   app.post(
