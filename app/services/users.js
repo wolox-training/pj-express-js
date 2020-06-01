@@ -5,7 +5,7 @@ const { User } = require('../models');
 const jwt = require('./jwt');
 const config = require('../../config');
 
-exports.createUser = data => {
+const createUser = data => {
   logger.info('Create User: ', data);
 
   return User.create(data).catch(error => {
@@ -16,7 +16,7 @@ exports.createUser = data => {
 
 const validateHash = (user, hash) => bcrypt.compare(user.password, hash);
 
-exports.createSession = async params => {
+const createSession = async params => {
   logger.info('Create Session:', params);
   const user = await User.findOne({ where: { mail: params.mail } });
   if (!user) {
@@ -30,7 +30,7 @@ exports.createSession = async params => {
   throw errors.authenticationError("The password and mail combination doesn't match");
 };
 
-exports.index = async req => {
+const index = async req => {
   logger.info('Index Users with: ', req);
   const page = req.headers.page || 0;
   const type =
@@ -46,3 +46,19 @@ exports.index = async req => {
   });
   return { users: rows, count, page };
 };
+
+const findUserByMail = mail => User.findOne({ where: { mail } });
+
+const invalidateAll = token => {
+  try {
+    return findUserByMail(jwt.validate(token).mail).then(user => {
+      user.tokenEmitDate = Date.now();
+      user.save();
+      return user;
+    });
+  } catch (err) {
+    throw errors.databaseError(err);
+  }
+};
+
+module.exports = { createUser, createSession, index, findUserByMail, invalidateAll };

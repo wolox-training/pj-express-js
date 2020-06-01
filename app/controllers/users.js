@@ -25,3 +25,9 @@ exports.index = (req, res, next) =>
     .index(req)
     .then(users => res.send(users))
     .catch(error => next(error));
+
+exports.invalidateAll = (req, res, next) =>
+  usersService
+    .invalidateAll(req.headers.authorization)
+    .then(() => res.send(200))
+    .catch(error => next(error));

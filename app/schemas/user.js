@@ -43,3 +43,10 @@ exports.index = {
     exists: true
   }
 };
+
+exports.invalidateAll = {
+  authorization: {
+    in: ['headers'],
+    exists: true
+  }
+};

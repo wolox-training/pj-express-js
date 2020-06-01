@@ -1,6 +1,7 @@
 const supertest = require('supertest');
 const { factory } = require('factory-girl');
 const converter = require('../helpers/converter');
+const jwt = require('../../app/services/jwt');
 
 const app = require('../../app');
 
@@ -209,6 +210,33 @@ describe('Users Controller', () => {
                 done();
               });
           });
+        });
+      });
+    });
+  });
+
+  describe('/POST users/sessions/invalidate_all', () => {
+    describe('when using valid parameters', () => {
+      it('should invalidate all session tokens', done => {
+        factory.create('User', { password: 'QSShBtjP' }).then(user => {
+          request
+            .post('/api/v1/users/sessions')
+            .send({
+              mail: user.mail,
+              password: '$2b$10$G4b27Ilbv5Jmg8IrtWzjUuiY3zD2wvG9OuWlXEbg60F5Xy8s1Z12u'
+            })
+            .set('Accept', 'application/json')
+            .then(res => {
+              request
+                .post('/api/v1/users/sessions/invalidate_all')
+                .set({ Accept: 'application/json', authorization: res.headers.authorization })
+                .then(() => {
+                  expect(
+                    jwt.validate(res.headers.authorization).iat < user.tokenEmitDate / 1000
+                  ).toBeTruthy();
+                  done();
+                });
+            });
         });
       });
     });

@@ -8,5 +8,5 @@ module.exports = {
       defaultValue: 'regular'
     }),
 
-  down: queryInterface => queryInterface.removeColumn('user', 'type')
+  down: queryInterface => queryInterface.removeColumn('users', 'type')
 };

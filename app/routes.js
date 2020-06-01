@@ -36,6 +36,11 @@ exports.init = app => {
     paramsValidator.validateSchemaAndFail(schemas.users.sessions),
     usersController.sessions
   );
+  app.post(
+    `${URL}/users/sessions/invalidate_all`,
+    paramsValidator.validateSchemaAndFail(schemas.users.invalidateAll),
+    usersController.invalidateAll
+  );
   app.get(
     `${URL}/albums`,
     [paramsValidator.validateSchemaAndFail(schemas.albums.authorization), authorizationValidator.validate],
