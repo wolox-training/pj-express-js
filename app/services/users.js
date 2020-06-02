@@ -29,4 +29,7 @@ exports.createSession = async params => {
   throw errors.authenticationError("The password and mail combination doesn't match");
 };
 
-exports.findUserByMail = mail => User.findOne({ where: { mail } });
+exports.findUserByMail = mail =>
+  User.findOne({ where: { mail } }).catch(error => {
+    throw errors.databaseError(error);
+  });
