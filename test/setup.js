@@ -14,6 +14,5 @@ global.beforeEach(async () => {
 
 global.afterEach(done => {
   nock.cleanAll();
-  nock.restore();
   done();
 });

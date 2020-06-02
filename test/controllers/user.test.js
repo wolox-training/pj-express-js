@@ -102,7 +102,7 @@ describe('Users Controller', () => {
             })
             .set('Accept', 'application/json')
             .then(res => {
-              expect(res.status).toBe(500);
+              expect(res.status).toBe(403);
               expect(res.body.internal_code).toBe('authentication_error');
               expect(res.headers.authorization).toBeUndefined();
               done();

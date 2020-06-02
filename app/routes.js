@@ -1,9 +1,11 @@
 const albumsController = require('./controllers/albums');
 const usersController = require('./controllers/users');
+const adminsController = require('./controllers/admins');
 const { healthCheck } = require('./controllers/healthCheck');
-const paramsValidator = require('./middlewares/paramsValidator');
+const paramsValidator = require('./middlewares/validators/paramsValidator');
 const schemas = require('./schemas');
-const authorizationValidator = require('./middlewares/authorizationValidator');
+const authorizationValidator = require('./middlewares/validators/authorizationValidator');
+const adminValidator = require('./middlewares/validators/adminValidator');
 
 const URL = '/api/v1';
 
@@ -13,6 +15,11 @@ exports.init = app => {
     `${URL}/users`,
     paramsValidator.validateSchemaAndFail(schemas.users.create),
     usersController.create
+  );
+  app.post(
+    `${URL}/admin/users`,
+    [paramsValidator.validateSchemaAndFail(schemas.admins.create), adminValidator.validateAdmin],
+    adminsController.create
   );
   app.post(
     `${URL}/users/sessions`,

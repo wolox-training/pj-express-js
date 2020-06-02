@@ -1,3 +1,6 @@
+/* eslint-disable new-cap */
+const userTypes = ['regular', 'admin'];
+
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define(
     'User',
@@ -10,6 +13,10 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         unique: true,
         isEmail: true
+      },
+      type: {
+        type: DataTypes.ENUM(userTypes),
+        defaultValue: 'regular'
       }
     },
     {
