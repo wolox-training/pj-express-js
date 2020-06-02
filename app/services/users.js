@@ -4,14 +4,20 @@ const logger = require('../logger');
 const { User } = require('../models');
 const jwt = require('./jwt');
 const config = require('../../config');
+const mailer = require('./mailer');
 
 const createUser = data => {
   logger.info('Create User: ', data);
 
-  return User.create(data).catch(error => {
-    logger.error(error);
-    throw errors.databaseError(error.message);
-  });
+  return User.create(data)
+    .then(user => {
+      mailer.sendMail(user);
+      return user;
+    })
+    .catch(error => {
+      logger.error(error);
+      throw errors.databaseError(error.message);
+    });
 };
 
 const validateHash = (user, hash) => bcrypt.compare(user.password, hash);
