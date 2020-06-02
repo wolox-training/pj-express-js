@@ -1,6 +1,8 @@
 const usersService = require('../services/users');
 const userMapper = require('../mappers/user');
 const bcrypt = require('../services/bcrypt');
+const jwt = require('../services/jwt');
+const config = require('../../config');
 
 exports.create = (req, res, next) =>
   bcrypt
@@ -20,8 +22,12 @@ exports.sessions = (req, res, next) =>
     })
     .catch(error => next(error));
 
-exports.getUsers = (req, res, next) =>
-  usersService
-    .getUsers(req)
+exports.getUsers = (req, res, next) => {
+  req.userType = jwt.validate(req.headers.authorization).type;
+  const page = req.headers.page || 0;
+  const limit = req.headers.limit || config.common.api.paginationLimit;
+  return usersService
+    .getUsers(page, limit, req.userType)
     .then(users => res.send(users))
     .catch(error => next(error));
+};

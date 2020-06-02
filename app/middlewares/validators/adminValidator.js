@@ -5,6 +5,7 @@ exports.validateAdmin = (req, res, next) => {
   try {
     if (jwt.validate(req.headers.authorization).type !== 'admin') {
       next(errors.authenticationError('User is not an Admin'));
+      return;
     }
     next();
   } catch (err) {

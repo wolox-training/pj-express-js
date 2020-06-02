@@ -3,7 +3,6 @@ const errors = require('../errors');
 const logger = require('../logger');
 const { User } = require('../models');
 const jwt = require('./jwt');
-const config = require('../../config');
 
 exports.createUser = data => {
   logger.info('Create User: ', data);
@@ -33,12 +32,9 @@ exports.createSession = async params => {
   throw errors.authenticationError("The password and mail combination doesn't match");
 };
 
-exports.getUsers = async req => {
+exports.getUsers = async (page, limit, userType) => {
   try {
-    const page = req.headers.page || 0;
-    const limit = req.headers.limit || config.common.api.paginationLimit;
-    const type =
-      jwt.validate(req.headers.authorization).type === 'regular' ? 'regular' : ['admin', 'regular'];
+    const type = userType === 'regular' ? 'regular' : ['admin', 'regular'];
     const { count, rows } = await User.findAndCountAll({
       where: {
         type

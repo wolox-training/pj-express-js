@@ -173,9 +173,12 @@ describe('Users Controller', () => {
       });
     });
 
-    describe('when using an regular user authentication', () => {
-      it('should list only regular users', done => {
-        factory.createMany('User', 5, { type: 'admin' }).then(() => {
+    describe('with 5 admin users created', () => {
+      beforeEach(() => {
+        factory.createMany('User', 5, { type: 'admin' });
+      });
+      describe('when using an regular user authentication', () => {
+        it('should list only regular users', done => {
           factory.create('User', { mail: 'pedro.jara@wolox.com.ar', type: 'regular' }).then(() => {
             request
               .get('/api/v1/users')
@@ -192,11 +195,9 @@ describe('Users Controller', () => {
           });
         });
       });
-    });
 
-    describe('when authentication header is missing', () => {
-      it('should not list users', done => {
-        factory.createMany('User', 5, { type: 'admin' }).then(() => {
+      describe('when authentication header is missing', () => {
+        it('should not list users', done => {
           factory.create('User', { mail: 'pedro.jara@wolox.com.ar', type: 'regular' }).then(() => {
             request
               .get('/api/v1/users')
