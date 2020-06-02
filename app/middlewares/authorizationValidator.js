@@ -6,7 +6,7 @@ exports.validate = async (req, res, next) => {
   try {
     const token = jwt.validate(req.headers.authorization);
     const user = await userService.findUserByMail(token.mail);
-    if (user.tokenEmitDate / 1000 < token.iat) {
+    if (user.tokenEmitDate / 1000 <= token.iat) {
       next();
     }
     next(errors.authenticationError('User Token has expired.'));

@@ -232,7 +232,7 @@ describe('Users Controller', () => {
                 .set({ Accept: 'application/json', authorization: res.headers.authorization })
                 .then(() => {
                   expect(
-                    jwt.validate(res.headers.authorization).iat < user.tokenEmitDate / 1000
+                    jwt.validate(res.headers.authorization).iat <= Math.round(user.tokenEmitDate / 1000)
                   ).toBeTruthy();
                   done();
                 });
