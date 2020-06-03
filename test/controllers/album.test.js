@@ -63,7 +63,7 @@ describe('Albums Controller', () => {
 
   describe('/GET albums/:id/photos', () => {
     describe('when using valid parameters', () => {
-      it('should respond with albums information', done => {
+      it('should respond with photos information', done => {
         nock(config.common.api.albumsApiUrl)
           .get('/photos?albumId=1')
           .reply(200, '../mocks/photosResponse.json', {

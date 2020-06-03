@@ -9,10 +9,6 @@ const truncateTable = model =>
 const truncateDatabase = () => Promise.all(tables.map(truncateTable));
 
 global.beforeEach(async () => {
-  await truncateDatabase();
-});
-
-global.afterEach(done => {
   nock.cleanAll();
-  done();
+  await truncateDatabase();
 });

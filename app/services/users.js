@@ -23,10 +23,29 @@ exports.createSession = async params => {
   }
   const result = await validateHash(user.dataValues, params.password);
   if (result) {
-    return { user_id: user.id, token: jwt.authorizationToken(params.mail) };
+    return {
+      user_id: user.id,
+      token: jwt.authorizationToken(user)
+    };
   }
   logger.error('Password and mail mismatch for user:', params.mail);
   throw errors.authenticationError("The password and mail combination doesn't match");
+};
+
+exports.getUsers = async (page, limit, userType) => {
+  try {
+    const type = userType === 'regular' ? 'regular' : ['admin', 'regular'];
+    const { count, rows } = await User.findAndCountAll({
+      where: {
+        type
+      },
+      offset: page,
+      limit
+    });
+    return { users: rows, count, page };
+  } catch (err) {
+    throw errors.databaseError(err);
+  }
 };
 
 exports.findUserByMail = mail =>

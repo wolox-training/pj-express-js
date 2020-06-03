@@ -11,7 +11,8 @@ exports.config = {
     },
     api: {
       albumsApiUrl: 'https://jsonplaceholder.typicode.com',
-      jwtSecret: '4b5376ba96346ca953df19bf51819085'
+      jwtSecret: '4b5376ba96346ca953df19bf51819085',
+      paginationLimit: 50
     }
   }
 };

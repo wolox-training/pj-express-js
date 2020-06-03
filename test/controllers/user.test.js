@@ -1,6 +1,7 @@
 const supertest = require('supertest');
 const { factory } = require('factory-girl');
 const converter = require('../helpers/converter');
+const authorizationToken = require('../helpers/authorizationTokens');
 
 const app = require('../../app');
 
@@ -146,6 +147,68 @@ describe('Users Controller', () => {
               expect(res.headers.authorization).toBeUndefined();
               done();
             });
+        });
+      });
+    });
+  });
+  describe('/GET users', () => {
+    describe('when using an admin user authentication', () => {
+      it('should list all users', done => {
+        factory.createMany('User', 5).then(() => {
+          factory.create('User', { mail: 'pedro.jara@wolox.com.ar', type: 'admin' }).then(() => {
+            request
+              .get('/api/v1/users')
+              .set({
+                Accept: 'application/json',
+                authorization: authorizationToken.adminToken
+              })
+              .then(res => {
+                expect(res.status).toBe(200);
+                expect(res.body.count).toBe(6);
+                expect(res.body.page).toBe(0);
+                done();
+              });
+          });
+        });
+      });
+    });
+
+    describe('with 5 admin users created', () => {
+      beforeEach(() => {
+        factory.createMany('User', 5, { type: 'admin' });
+      });
+      describe('when using an regular user authentication', () => {
+        it('should list only regular users', done => {
+          factory.create('User', { mail: 'pedro.jara@wolox.com.ar', type: 'regular' }).then(() => {
+            request
+              .get('/api/v1/users')
+              .set({
+                Accept: 'application/json',
+                authorization: authorizationToken.regularToken
+              })
+              .then(res => {
+                expect(res.status).toBe(200);
+                expect(res.body.count).toBe(1);
+                expect(res.body.page).toBe(0);
+                done();
+              });
+          });
+        });
+      });
+
+      describe('when authentication header is missing', () => {
+        it('should not list users', done => {
+          factory.create('User', { mail: 'pedro.jara@wolox.com.ar', type: 'regular' }).then(() => {
+            request
+              .get('/api/v1/users')
+              .set({
+                Accept: 'application/json'
+              })
+              .then(res => {
+                expect(res.status).toBe(422);
+                done();
+              });
+          });
         });
       });
     });

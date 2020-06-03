@@ -36,3 +36,10 @@ exports.sessions = {
     }
   }
 };
+
+exports.index = {
+  authorization: {
+    in: ['headers'],
+    exists: true
+  }
+};

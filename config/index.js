@@ -1,7 +1,7 @@
 const ENVIRONMENT = process.env.NODE_ENV || 'development';
-const dotenv = require('dotenv');
 
-if (ENVIRONMENT !== 'production') dotenv.config();
+// eslint-disable-next-line global-require
+if (ENVIRONMENT !== 'production') require('dotenv').config();
 
 const configFile = `./${ENVIRONMENT}`;
 
@@ -35,7 +35,8 @@ const config = {
       parameterLimit: process.env.API_PARAMETER_LIMIT,
       port: process.env.PORT,
       albumsApiUrl: process.env.ALBUMS_API_URL,
-      jwtSecret: process.env.JWT_SECRET
+      jwtSecret: process.env.JWT_SECRET,
+      paginationLimit: process.env.PAGINATION_LIMIT
     },
     session: {
       header_name: 'authorization',

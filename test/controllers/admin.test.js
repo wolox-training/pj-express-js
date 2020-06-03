@@ -1,5 +1,6 @@
 const supertest = require('supertest');
 const { factory } = require('factory-girl');
+const authorizationTokens = require('../helpers/authorizationTokens');
 
 const app = require('../../app');
 
@@ -24,8 +25,7 @@ describe('Admin Controller', () => {
               })
               .set({
                 Accept: 'application/json',
-                authorization:
-                  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
+                authorization: authorizationTokens.adminToken
               })
               .then(response => {
                 expect(response.status).toBe(200);
@@ -52,8 +52,7 @@ describe('Admin Controller', () => {
             })
             .set({
               Accept: 'application/json',
-              authorization:
-                'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
+              authorization: authorizationTokens.adminToken
             })
             .then(response => {
               expect(response.status).toBe(200);
@@ -95,8 +94,7 @@ describe('Admin Controller', () => {
           })
           .set({
             Accept: 'application/json',
-            authorization:
-              'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
+            authorization: authorizationTokens.regularToken
           })
           .then(response => {
             expect(response.status).toBe(403);
