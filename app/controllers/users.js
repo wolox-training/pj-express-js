@@ -7,8 +7,7 @@ const config = require('../../config');
 exports.create = (req, res, next) =>
   bcrypt
     .crypt(req.body.password)
-    .then(hash => (req.body.password = hash))
-    .then(() => userMapper.create(req.body))
+    .then(hash => userMapper.create(req.body, hash))
     .then(mapped_body => usersService.createUser(mapped_body))
     .then(user => res.send(user))
     .catch(error => next(error));
