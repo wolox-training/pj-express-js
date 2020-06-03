@@ -24,17 +24,24 @@ const queryString = queryParams => {
   return Object.keys(queryParams).length ? `?${querystring.stringify(queryParams)}` : '';
 };
 
-exports.getAlbums = (queryParams = {}) =>
+const getAlbums = (queryParams = {}) =>
   get(`${options.uri}/albums${queryString(queryParams)}`).then(response => response.data);
 
-exports.getPhotos = (queryParams = {}) =>
+const getPhotos = (queryParams = {}) =>
   get(`${options.uri}/photos${queryString(queryParams)}`).then(response => response.data);
 
-exports.buyAlbum = data => {
+const buyAlbum = async data => {
   logger.info('Create UserAlbum: ', data);
+  const albums = await getAlbums({ id: data.albumId });
+  logger.info('Albums:', albums);
+  if (albums.length === 0) {
+    throw errors.notFound(`Album with Id: ${data.albumId} doesn't exist`);
+  }
 
   return UserAlbum.create(data).catch(error => {
     logger.error(error);
     throw errors.databaseError(error.message);
   });
 };
+
+module.exports = { getAlbums, getPhotos, buyAlbum };
