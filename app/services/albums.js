@@ -30,8 +30,13 @@ exports.getAlbums = (queryParams = {}) =>
 exports.getPhotos = (queryParams = {}) =>
   get(`${options.uri}/photos${queryString(queryParams)}`).then(response => response.data);
 
-exports.buyAlbum = data => {
+exports.buyAlbum = async data => {
   logger.info('Create UserAlbum: ', data);
+  const albums = await this.getAlbums({ id: data.albumId });
+  logger.info('Albums:', albums);
+  if (albums.length === 0) {
+    throw errors.notFound(`Album with Id: ${data.albumId} doesn't exist`);
+  }
 
   return UserAlbum.create(data).catch(error => {
     logger.error(error);
