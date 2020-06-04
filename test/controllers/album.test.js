@@ -13,8 +13,8 @@ const request = supertest(app);
 require('../factory/models');
 
 describe('Albums Controller', () => {
-  beforeEach(() => {
-    factory.create('User', { mail: 'pedro.jara@wolox.com.ar' });
+  beforeEach(async () => {
+    await factory.create('User', { mail: 'pedro.jara@wolox.com.ar' });
   });
   describe('/GET albums', () => {
     describe('when using valid parameters', () => {

@@ -221,25 +221,27 @@ describe('Users Controller', () => {
   describe('/POST users/sessions/invalidate_all', () => {
     describe('when using valid parameters', () => {
       it('should invalidate all session tokens', done => {
-        factory.create('User', { password: 'QSShBtjP' }).then(user => {
+        factory.create('User', { mail: 'pedro.jara@wolox.com.ar' }).then(user => {
           request
-            .post('/api/v1/users/sessions')
-            .send({
-              mail: user.mail,
-              password: '$2b$10$G4b27Ilbv5Jmg8IrtWzjUuiY3zD2wvG9OuWlXEbg60F5Xy8s1Z12u'
-            })
-            .set('Accept', 'application/json')
-            .then(res => {
-              request
-                .post('/api/v1/users/sessions/invalidate_all')
-                .set({ Accept: 'application/json', authorization: res.headers.authorization })
-                .then(() => {
-                  expect(
-                    jwt.validate(res.headers.authorization).iat <= Math.round(user.tokenEmitDate / 1000)
-                  ).toBeTruthy();
-                  done();
-                });
+            .post('/api/v1/users/sessions/invalidate_all')
+            .set({ Accept: 'application/json', authorization: authorizationToken.expiredToken })
+            .then(() => {
+              expect(
+                jwt.validate(authorizationToken.expiredToken).iat <= Math.round(user.tokenEmitDate / 1000)
+              ).toBeTruthy();
+              done();
             });
+        });
+      });
+
+      describe("when sessions aren't invalidated", () => {
+        it('should keep tokens valid', done => {
+          factory.create('User', { mail: 'pedro.jara@wolox.com.ar' }).then(user => {
+            expect(
+              jwt.validate(authorizationToken.regularToken).iat > Math.round(user.tokenEmitDate / 1000)
+            ).toBeTruthy();
+            done();
+          });
         });
       });
     });
