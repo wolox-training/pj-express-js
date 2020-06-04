@@ -1,11 +1,10 @@
 const bcrypt = require('bcrypt');
 const errors = require('../errors');
 const logger = require('../logger');
-const { User } = require('../models');
+const { User, UserAlbum } = require('../models');
 const jwt = require('./jwt');
-const config = require('../../config');
 
-const createUser = data => {
+exports.createUser = data => {
   logger.info('Create User: ', data);
 
   return User.create(data).catch(error => {
@@ -16,7 +15,7 @@ const createUser = data => {
 
 const validateHash = (user, hash) => bcrypt.compare(user.password, hash);
 
-const createSession = async params => {
+exports.createSession = async params => {
   logger.info('Create Session:', params);
   const user = await User.findOne({ where: { mail: params.mail } });
   if (!user) {
@@ -24,34 +23,53 @@ const createSession = async params => {
   }
   const result = await validateHash(user.dataValues, params.password);
   if (result) {
-    return { user_id: user.id, token: jwt.authorizationToken(params.mail) };
+    return {
+      user_id: user.id,
+      token: jwt.authorizationToken(user)
+    };
   }
   logger.error('Password and mail mismatch for user:', params.mail);
   throw errors.authenticationError("The password and mail combination doesn't match");
 };
 
-const index = async req => {
-  logger.info('Index Users with: ', req);
-  const page = req.headers.page || 0;
-  const type =
-    (await jwt.findUserByToken(req.headers.authorization)).type === 'regular'
-      ? 'regular'
-      : ['admin', 'regular'];
-  const { count, rows } = await User.findAndCountAll({
-    where: {
-      type
-    },
-    offset: page,
-    limit: config.common.api.paginationLimit
-  });
-  return { users: rows, count, page };
+exports.getUsers = async (page, limit, userType) => {
+  try {
+    const type = userType === 'regular' ? 'regular' : ['admin', 'regular'];
+    const { count, rows } = await User.findAndCountAll({
+      where: {
+        type
+      },
+      offset: page,
+      limit
+    });
+    return { users: rows, count, page };
+  } catch (err) {
+    throw errors.databaseError(err);
+  }
 };
 
-const findUserByMail = mail => User.findOne({ where: { mail } });
+exports.findUserByMail = mail =>
+  User.findOne({ where: { mail } }).catch(error => {
+    throw errors.databaseError(error);
+  });
 
-const invalidateAll = token => {
+exports.getUserAlbums = async (userId, tokenMail) => {
+  logger.info(`Index UserId: ${userId}'s Albums`);
+  const user = await User.findByPk(userId);
+  const tokenUser = await this.findUserByMail(tokenMail);
+  if (!user) throw errors.notFound(`User with Id ${userId} not found`);
+  if (!(user.id === tokenUser.id || tokenUser.type === 'admin')) {
+    throw errors.authenticationError(`UserId ${userId} doesn't have the required permission`);
+  }
+  const userAlbums = await UserAlbum.findAll({ where: { userId } }).catch(err => {
+    throw errors.databaseError(err);
+  });
+  return userAlbums;
+};
+
+exports.invalidateAll = token => {
   try {
-    return findUserByMail(jwt.validate(token).mail).then(user => {
+    return this.findUserByMail(token.mail).then(user => {
       user.tokenEmitDate = Date.now();
       user.save();
       return user;
@@ -60,5 +78,3 @@ const invalidateAll = token => {
     throw errors.databaseError(err);
   }
 };
-
-module.exports = { createUser, createSession, index, findUserByMail, invalidateAll };

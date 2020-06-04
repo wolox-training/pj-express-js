@@ -1,7 +1,11 @@
+/* eslint-disable max-lines */
 const supertest = require('supertest');
 const { factory } = require('factory-girl');
+const nock = require('nock');
 const converter = require('../helpers/converter');
 const jwt = require('../../app/services/jwt');
+const { config } = require('../../config/testing');
+const authorizationToken = require('../helpers/authorizationTokens');
 
 const app = require('../../app');
 
@@ -103,7 +107,7 @@ describe('Users Controller', () => {
             })
             .set('Accept', 'application/json')
             .then(res => {
-              expect(res.status).toBe(500);
+              expect(res.status).toBe(403);
               expect(res.body.internal_code).toBe('authentication_error');
               expect(res.headers.authorization).toBeUndefined();
               done();
@@ -160,8 +164,7 @@ describe('Users Controller', () => {
               .get('/api/v1/users')
               .set({
                 Accept: 'application/json',
-                authorization:
-                  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
+                authorization: authorizationToken.adminToken
               })
               .then(res => {
                 expect(res.status).toBe(200);
@@ -174,16 +177,18 @@ describe('Users Controller', () => {
       });
     });
 
-    describe('when using an regular user authentication', () => {
-      it('should list only regular users', done => {
-        factory.createMany('User', 5, { type: 'admin' }).then(() => {
+    describe('with 5 admin users created', () => {
+      beforeEach(() => {
+        factory.createMany('User', 5, { type: 'admin' });
+      });
+      describe('when using an regular user authentication', () => {
+        it('should list only regular users', done => {
           factory.create('User', { mail: 'pedro.jara@wolox.com.ar', type: 'regular' }).then(() => {
             request
               .get('/api/v1/users')
               .set({
                 Accept: 'application/json',
-                authorization:
-                  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
+                authorization: authorizationToken.regularToken
               })
               .then(res => {
                 expect(res.status).toBe(200);
@@ -194,11 +199,9 @@ describe('Users Controller', () => {
           });
         });
       });
-    });
 
-    describe('when authentication header is missing', () => {
-      it('should not list users', done => {
-        factory.createMany('User', 5, { type: 'admin' }).then(() => {
+      describe('when authentication header is missing', () => {
+        it('should not list users', done => {
           factory.create('User', { mail: 'pedro.jara@wolox.com.ar', type: 'regular' }).then(() => {
             request
               .get('/api/v1/users')
@@ -238,6 +241,92 @@ describe('Users Controller', () => {
                 });
             });
         });
+      });
+    });
+  });
+
+  describe('/GET users/:id/albums', () => {
+    describe('when using valid params', () => {
+      it("should list all user's albums", done => {
+        nock(config.common.api.albumsApiUrl)
+          .get('/albums?id=2')
+          .replyWithFile(200, `${process.cwd()}/test/mocks/limitedAlbumsResponse.json`, {
+            'Content-Type': 'application/json'
+          });
+        factory.create('User', { mail: 'pedro.jara@wolox.com.ar' }).then(user => {
+          factory.create('UserAlbum', { userId: user.id, albumId: 2 }).then(() => {
+            request
+              .get(`/api/v1/users/${user.id}/albums`)
+              .set({
+                Accept: 'application/json',
+                authorization:
+                  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
+              })
+              .then(res => {
+                expect(res.status).toBe(200);
+                expect(res.body[0].id).toBe(2);
+                done();
+              });
+          });
+        });
+      });
+    });
+
+    describe('when using admin user', () => {
+      it("should list other user's albums", done => {
+        nock(config.common.api.albumsApiUrl)
+          .get('/albums?id=2')
+          .replyWithFile(200, `${process.cwd()}/test/mocks/limitedAlbumsResponse.json`, {
+            'Content-Type': 'application/json'
+          });
+        factory.create('User', { mail: 'pedro.jara@wolox.com.ar', type: 'admin' }).then(() => {
+          factory.create('User', { type: 'regular' }).then(user => {
+            factory.create('UserAlbum', { userId: user.id, albumId: 2 }).then(() => {
+              request
+                .get(`/api/v1/users/${user.id}/albums`)
+                .set({
+                  Accept: 'application/json',
+                  authorization:
+                    'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
+                })
+                .then(res => {
+                  expect(res.status).toBe(200);
+                  expect(res.body[0].id).toBe(2);
+                  done();
+                });
+            });
+          });
+        });
+      });
+    });
+
+    describe("when user doesn't exist", () => {
+      it('should return status 404', done => {
+        request
+          .get('/api/v1/users/1/albums')
+          .set({
+            Accept: 'application/json',
+            authorization:
+              'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
+          })
+          .then(res => {
+            expect(res.status).toBe(404);
+            done();
+          });
+      });
+    });
+
+    describe('when there is no authorization header', () => {
+      it('should return status 422', done => {
+        request
+          .get('/api/v1/users/1/albums')
+          .set({
+            Accept: 'application/json'
+          })
+          .then(res => {
+            expect(res.status).toBe(422);
+            done();
+          });
       });
     });
   });

@@ -3,6 +3,9 @@ const { factory } = require('factory-girl');
 const supertest = require('supertest');
 const app = require('../../app');
 const { config } = require('../../config/testing');
+const albumsResponse = require('../mocks/albumsResponse.json');
+const photosResponse = require('../mocks/photosResponse.json');
+const oneAlbumResponse = require('../mocks/oneAlbumResponse.json');
 
 const request = supertest(app);
 
@@ -14,7 +17,7 @@ describe('Albums Controller', () => {
       it('should respond with albums information', done => {
         nock(config.common.api.albumsApiUrl)
           .get('/albums')
-          .reply(200, '../mocks/albumsResponse.json', {
+          .reply(200, albumsResponse, {
             'Content-Type': 'application/json'
           });
         request
@@ -26,6 +29,7 @@ describe('Albums Controller', () => {
           })
           .then(response => {
             expect(response.status).toBe(200);
+            expect(response.body.length).toBe(100);
             done();
           });
       });
@@ -55,7 +59,7 @@ describe('Albums Controller', () => {
               'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcaaaa'
           })
           .then(response => {
-            expect(response.status).toBe(500);
+            expect(response.status).toBe(403);
             done();
           });
       });
@@ -67,7 +71,7 @@ describe('Albums Controller', () => {
       it('should respond with photos information', done => {
         nock(config.common.api.albumsApiUrl)
           .get('/photos?albumId=1')
-          .reply(200, '../mocks/photosResponse.json', {
+          .reply(200, photosResponse, {
             'Content-Type': 'application/json'
           });
         request
@@ -109,7 +113,7 @@ describe('Albums Controller', () => {
             'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQaaaaa'
         })
         .then(response => {
-          expect(response.status).toBe(500);
+          expect(response.status).toBe(403);
           done();
         });
     });
@@ -117,7 +121,12 @@ describe('Albums Controller', () => {
 
   describe('/POST albums/:id', () => {
     describe('when using valid parameters', () => {
-      it('should respond with photos information', done => {
+      it('should buy an album', done => {
+        nock(config.common.api.albumsApiUrl)
+          .get('/albums?id=1')
+          .reply(200, oneAlbumResponse, {
+            'Content-Type': 'application/json'
+          });
         factory.create('User', { mail: 'pedro.jara@wolox.com.ar' }).then(user => {
           request
             .post('/api/v1/albums/1')
@@ -142,6 +151,11 @@ describe('Albums Controller', () => {
     describe('when trying to buy twice the same album', () => {
       it('should respond with error', done => {
         factory.create('UserAlbum', { albumId: 1 }).then(() => {
+          nock(config.common.api.albumsApiUrl)
+            .get('/albums?id=1')
+            .reply(200, oneAlbumResponse, {
+              'Content-Type': 'application/json'
+            });
           factory.create('User', { mail: 'pedro.jara@wolox.com.ar' }).then(user => {
             request
               .post('/api/v1/albums/1')
@@ -177,6 +191,32 @@ describe('Albums Controller', () => {
             })
             .then(response => {
               expect(response.status).toBe(503);
+              done();
+            });
+        });
+      });
+    });
+
+    describe("when album doesn't exist", () => {
+      it('should not buy an album', done => {
+        nock(config.common.api.albumsApiUrl)
+          .get('/albums?id=0')
+          .reply(200, [], {
+            'Content-Type': 'application/json'
+          });
+        factory.create('User', { mail: 'pedro.jara@wolox.com.ar' }).then(user => {
+          request
+            .post('/api/v1/albums/0')
+            .send({
+              user_id: user.id
+            })
+            .set({
+              Accept: 'application/json',
+              authorization:
+                'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
+            })
+            .then(response => {
+              expect(response.status).toBe(404);
               done();
             });
         });
