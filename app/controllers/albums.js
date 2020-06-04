@@ -11,3 +11,9 @@ exports.getAlbumPhotos = (req, res, next) =>
     .getPhotos({ albumId: req.params.id, ...req.query })
     .then(photoData => res.send(photoData))
     .catch(error => next(error));
+
+exports.buyAlbum = (req, res, next) =>
+  albumsService
+    .buyAlbum({ albumId: req.params.id, userId: req.body.user_id })
+    .then(response => res.send(response))
+    .catch(error => next(error));

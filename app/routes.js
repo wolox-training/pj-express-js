@@ -36,6 +36,11 @@ exports.init = app => {
     [paramsValidator.validateSchemaAndFail(schemas.albums.authorization), authorizationValidator.validate],
     albumsController.getAlbums
   );
+  app.post(
+    `${URL}/albums/:id`,
+    [paramsValidator.validateSchemaAndFail(schemas.albums.buyAlbum), authorizationValidator.validate],
+    albumsController.buyAlbum
+  );
   app.get(
     `${URL}/albums/:id/photos`,
     [paramsValidator.validateSchemaAndFail(schemas.albums.authorization), authorizationValidator.validate],
