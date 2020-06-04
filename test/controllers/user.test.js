@@ -5,6 +5,7 @@ const nock = require('nock');
 const converter = require('../helpers/converter');
 const { config } = require('../../config/testing');
 const authorizationToken = require('../helpers/authorizationTokens');
+const limitedAlbumsResponse = require('../mocks/limitedAlbumsResponse.json');
 
 const app = require('../../app');
 
@@ -222,7 +223,7 @@ describe('Users Controller', () => {
       it("should list all user's albums", done => {
         nock(config.common.api.albumsApiUrl)
           .get('/albums?id=2')
-          .replyWithFile(200, `${process.cwd()}/test/mocks/limitedAlbumsResponse.json`, {
+          .reply(200, limitedAlbumsResponse, {
             'Content-Type': 'application/json'
           });
         factory.create('User', { mail: 'pedro.jara@wolox.com.ar' }).then(user => {
@@ -248,7 +249,7 @@ describe('Users Controller', () => {
       it("should list other user's albums", done => {
         nock(config.common.api.albumsApiUrl)
           .get('/albums?id=2')
-          .replyWithFile(200, `${process.cwd()}/test/mocks/limitedAlbumsResponse.json`, {
+          .reply(200, limitedAlbumsResponse, {
             'Content-Type': 'application/json'
           });
         factory.create('User', { mail: 'pedro.jara@wolox.com.ar', type: 'admin' }).then(() => {
