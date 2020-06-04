@@ -3,7 +3,7 @@ const config = require('../../config');
 
 exports.authorizationToken = user => {
   const currentTime = Date.now() / 1000;
-  const expireTime = config.common.api.tokenExpireHours * 60 * 60;
+  const expireTime = config.common.api.tokenExpireSeconds;
   return jwt.encode(
     { mail: user.mail, type: user.type, exp: Math.round(currentTime + expireTime) },
     config.common.api.jwtSecret
