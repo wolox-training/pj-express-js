@@ -259,8 +259,7 @@ describe('Users Controller', () => {
               .get(`/api/v1/users/${user.id}/albums`)
               .set({
                 Accept: 'application/json',
-                authorization:
-                  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
+                authorization: authorizationToken.regularToken
               })
               .then(res => {
                 expect(res.status).toBe(200);
@@ -286,8 +285,7 @@ describe('Users Controller', () => {
                 .get(`/api/v1/users/${user.id}/albums`)
                 .set({
                   Accept: 'application/json',
-                  authorization:
-                    'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
+                  authorization: authorizationToken.adminToken
                 })
                 .then(res => {
                   expect(res.status).toBe(200);
@@ -302,17 +300,18 @@ describe('Users Controller', () => {
 
     describe("when user doesn't exist", () => {
       it('should return status 404', done => {
-        request
-          .get('/api/v1/users/1/albums')
-          .set({
-            Accept: 'application/json',
-            authorization:
-              'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
-          })
-          .then(res => {
-            expect(res.status).toBe(404);
-            done();
-          });
+        factory.create('User', { mail: 'pedro.jara@wolox.com.ar', type: 'admin' }).then(() => {
+          request
+            .get('/api/v1/users/0/albums')
+            .set({
+              Accept: 'application/json',
+              authorization: authorizationToken.adminToken
+            })
+            .then(res => {
+              expect(res.status).toBe(404);
+              done();
+            });
+        });
       });
     });
 

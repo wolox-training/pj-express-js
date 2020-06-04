@@ -67,14 +67,7 @@ exports.getUserAlbums = async (userId, tokenMail) => {
   return userAlbums;
 };
 
-exports.invalidateAll = token => {
-  try {
-    return this.findUserByMail(token.mail).then(user => {
-      user.tokenEmitDate = Date.now();
-      user.save();
-      return user;
-    });
-  } catch (err) {
+exports.invalidateAll = token =>
+  User.update({ tokenEmiteDate: Date.now() }, { where: { mail: token.mail } }).catch(err => {
     throw errors.databaseError(err);
-  }
-};
+  });

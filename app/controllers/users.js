@@ -35,7 +35,7 @@ exports.getUsers = (req, res, next) => {
 exports.invalidateAll = (req, res, next) => {
   usersService
     .invalidateAll(jwt.validate(req.headers.authorization))
-    .then(() => res.send(200))
+    .then(() => res.sendStatus(200))
     .catch(error => next(error));
 };
 
