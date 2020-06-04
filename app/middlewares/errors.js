@@ -9,7 +9,8 @@ const statusCodes = {
   [errors.EXTERNAL_API_ERROR]: 503,
   [errors.SERVER_ERROR]: 500,
   [errors.INVALID_PARAMS]: 422,
-  [errors.NOT_FOUND]: 404
+  [errors.NOT_FOUND]: 404,
+  [errors.AUTHENTICATION_ERROR]: 403
 };
 
 exports.handle = (error, req, res, next) => {

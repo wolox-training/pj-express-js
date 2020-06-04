@@ -38,3 +38,5 @@ exports.buyAlbum = data => {
     throw errors.databaseError(error.message);
   });
 };
+
+exports.albumsBy = filter => this.getAlbums(filter);

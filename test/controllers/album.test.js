@@ -55,7 +55,7 @@ describe('Albums Controller', () => {
               'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcaaaa'
           })
           .then(response => {
-            expect(response.status).toBe(500);
+            expect(response.status).toBe(403);
             done();
           });
       });
@@ -109,7 +109,7 @@ describe('Albums Controller', () => {
             'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQaaaaa'
         })
         .then(response => {
-          expect(response.status).toBe(500);
+          expect(response.status).toBe(403);
           done();
         });
     });

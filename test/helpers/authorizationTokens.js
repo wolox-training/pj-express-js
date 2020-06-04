@@ -1,0 +1,4 @@
+exports.adminToken =
+  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIiLCJ0eXBlIjoiYWRtaW4ifQ.NY77hK4zAhgXBRFHTZaQde8pyRTeBilbm2Bnjp6Rhcc';
+exports.regularToken =
+  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIiLCJ0eXBlIjoicmVndWxhciJ9.5dMVAHsHEWa2myaD16ZoNhRpJc7JIkmQ9MyYesj31QY';
