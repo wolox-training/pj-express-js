@@ -3,6 +3,9 @@ const { factory } = require('factory-girl');
 const supertest = require('supertest');
 const app = require('../../app');
 const { config } = require('../../config/testing');
+const albumsResponse = require('../mocks/albumsResponse.json');
+const photosResponse = require('../mocks/photosResponse.json');
+const oneAlbumResponse = require('../mocks/oneAlbumResponse.json');
 
 const request = supertest(app);
 
@@ -14,7 +17,7 @@ describe('Albums Controller', () => {
       it('should respond with albums information', done => {
         nock(config.common.api.albumsApiUrl)
           .get('/albums')
-          .replyWithFile(200, `${process.cwd()}/test/mocks/albumsResponse.json`, {
+          .reply(200, albumsResponse, {
             'Content-Type': 'application/json'
           });
         request
@@ -68,7 +71,7 @@ describe('Albums Controller', () => {
       it('should respond with photos information', done => {
         nock(config.common.api.albumsApiUrl)
           .get('/photos?albumId=1')
-          .replyWithFile(200, `${process.cwd()}/test/mocks/photosResponse.json`, {
+          .reply(200, photosResponse, {
             'Content-Type': 'application/json'
           });
         request
@@ -121,7 +124,7 @@ describe('Albums Controller', () => {
       it('should buy an album', done => {
         nock(config.common.api.albumsApiUrl)
           .get('/albums?id=1')
-          .replyWithFile(200, `${process.cwd()}/test/mocks/oneAlbumResponse.json`, {
+          .reply(200, oneAlbumResponse, {
             'Content-Type': 'application/json'
           });
         factory.create('User', { mail: 'pedro.jara@wolox.com.ar' }).then(user => {
@@ -150,7 +153,7 @@ describe('Albums Controller', () => {
         factory.create('UserAlbum', { albumId: 1 }).then(() => {
           nock(config.common.api.albumsApiUrl)
             .get('/albums?id=1')
-            .replyWithFile(200, `${process.cwd()}/test/mocks/oneAlbumResponse.json`, {
+            .reply(200, oneAlbumResponse, {
               'Content-Type': 'application/json'
             });
           factory.create('User', { mail: 'pedro.jara@wolox.com.ar' }).then(user => {
@@ -198,7 +201,7 @@ describe('Albums Controller', () => {
       it('should not buy an album', done => {
         nock(config.common.api.albumsApiUrl)
           .get('/albums?id=0')
-          .replyWithFile(200, `${process.cwd()}/test/mocks/emptyAlbumsResponse.json`, {
+          .reply(200, [], {
             'Content-Type': 'application/json'
           });
         factory.create('User', { mail: 'pedro.jara@wolox.com.ar' }).then(user => {
