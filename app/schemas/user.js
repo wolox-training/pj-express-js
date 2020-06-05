@@ -50,3 +50,10 @@ exports.invalidateAll = {
     exists: true
   }
 };
+
+exports.indexUserAlbums = {
+  authorization: {
+    in: ['headers'],
+    exists: true
+  }
+};
