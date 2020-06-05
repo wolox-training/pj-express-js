@@ -54,15 +54,16 @@ exports.findUserByMail = mail =>
   });
 
 exports.getUserAlbums = async (userId, tokenMail) => {
-  logger.info(`Index UserId: ${userId}'s Albums`);
-  const user = await User.findByPk(userId);
-  const tokenUser = await this.findUserByMail(tokenMail);
-  if (!user) throw errors.notFound(`User with Id ${userId} not found`);
-  if (!(user.id === tokenUser.id || tokenUser.type === 'admin')) {
-    throw errors.authenticationError(`UserId ${userId} doesn't have the required permission`);
+  try {
+    logger.info(`Index UserId: ${userId}'s Albums`);
+    const user = await User.findByPk(userId);
+    const tokenUser = await this.findUserByMail(tokenMail);
+    if (!(user.id === tokenUser.id || tokenUser.type === 'admin')) {
+      throw errors.authenticationError(`UserId ${userId} doesn't have the required permission`);
+    }
+    const userAlbums = await UserAlbum.findAll({ where: { userId } });
+    return userAlbums;
+  } catch (err) {
+    throw errors.notFound(err);
   }
-  const userAlbums = await UserAlbum.findAll({ where: { userId } }).catch(err => {
-    throw errors.databaseError(err);
-  });
-  return userAlbums;
 };

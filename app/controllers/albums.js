@@ -1,4 +1,5 @@
 const albumsService = require('../services/albums');
+const userAlbumsService = require('../services/userAlbums');
 
 exports.getAlbums = (req, res, next) =>
   albumsService
@@ -13,7 +14,7 @@ exports.getAlbumPhotos = (req, res, next) =>
     .catch(error => next(error));
 
 exports.buyAlbum = (req, res, next) =>
-  albumsService
+  userAlbumsService
     .buyAlbum({ albumId: req.params.id, userId: req.body.user_id })
     .then(response => res.send(response))
     .catch(error => next(error));

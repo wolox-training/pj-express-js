@@ -32,11 +32,9 @@ exports.getUsers = (req, res, next) => {
     .catch(error => next(error));
 };
 
-exports.getUserAlbums = (req, res, next) => {
-  req.userToken = jwt.validate(req.headers.authorization);
-  return usersService
+exports.getUserAlbums = (req, res, next) =>
+  usersService
     .getUserAlbums(req.params.id, req.userToken.mail)
     .then(userAlbums => albumsService.albumsBy({ id: userAlbums.map(ua => ua.albumId) }))
     .then(albums => res.send(albums))
     .catch(error => next(error));
-};
