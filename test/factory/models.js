@@ -7,6 +7,7 @@ factory.define('User', User, {
   lastName: factory.chance('last'),
   password: factory.chance('string', { length: 8, alpha: true }),
   mail: factory.chance('email', { domain: 'wolox.com.ar' }),
+  tokenEmitDate: factory.chance('date', { year: 2020, month: 5, day: 3 }),
   type: 'regular'
 });
 

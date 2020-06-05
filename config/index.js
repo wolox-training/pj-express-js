@@ -37,7 +37,7 @@ const config = {
       albumsApiUrl: process.env.ALBUMS_API_URL,
       jwtSecret: process.env.JWT_SECRET,
       paginationLimit: process.env.PAGINATION_LIMIT,
-      tokenExpireHours: process.env.TOKEN_EXPIRE_HOURS || 5
+      tokenExpireSeconds: process.env.TOKEN_EXPIRE_SECONDS || 30
     },
     session: {
       header_name: 'authorization',
