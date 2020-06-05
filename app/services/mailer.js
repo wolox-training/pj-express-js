@@ -1,22 +1,21 @@
 'use strict';
 const nodemailer = require('nodemailer');
 const logger = require('../logger');
+const config = require('../../config');
+
+const transporter = nodemailer.createTransport({
+  host: config.common.mailer.mailerHost,
+  port: config.common.mailer.mailerPort,
+  secure: false,
+  auth: {
+    user: config.common.mailer.user,
+    pass: config.common.mailer.pass
+  }
+});
 
 exports.sendMail = async user => {
-  const testAccount = await nodemailer.createTestAccount();
-
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.ethereal.email',
-    port: 587,
-    secure: false,
-    auth: {
-      user: testAccount.user,
-      pass: testAccount.pass
-    }
-  });
-
   const info = await transporter.sendMail({
-    from: '"WAlbums Admin" <admin@walbums.com>',
+    from: `"WAlbums Admin" <${config.common.mailer.adminMail}>`,
     to: user.mail,
     subject: 'Welcome to WAlbums',
     text: 'Welcome to WAlbums',

@@ -39,6 +39,13 @@ const config = {
       paginationLimit: process.env.PAGINATION_LIMIT,
       tokenExpireSeconds: process.env.TOKEN_EXPIRE_SECONDS || 30
     },
+    mailer: {
+      mailerHost: process.env.MAILER_HOST,
+      mailerPort: process.env.MAILER_PORT,
+      mailerUser: process.env.MAILER_USER,
+      mailerPass: process.env.MAILER_PASS,
+      adminMail: process.env.ADMIN_MAIL
+    },
     session: {
       header_name: 'authorization',
       secret: process.env.NODE_API_SESSION_SECRET
