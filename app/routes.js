@@ -6,6 +6,7 @@ const paramsValidator = require('./middlewares/validators/paramsValidator');
 const schemas = require('./schemas');
 const authorizationValidator = require('./middlewares/validators/authorizationValidator');
 const adminValidator = require('./middlewares/validators/adminValidator');
+const userAlbumsValidator = require('./middlewares/validators/userAlbumsValidator');
 const buyAlbumValidator = require('./middlewares/validators/buyAlbumValidator');
 const userAlbumsMiddleware = require('./middlewares/userAlbumsMiddleware');
 
@@ -23,7 +24,8 @@ exports.init = app => {
     [
       paramsValidator.validateSchemaAndFail(schemas.users.indexUserAlbums),
       authorizationValidator.validate,
-      userAlbumsMiddleware.updateReq
+      userAlbumsMiddleware.updateReq,
+      userAlbumsValidator.validate
     ],
     usersController.getUserAlbums
   );

@@ -273,6 +273,33 @@ describe('Users Controller', () => {
       });
     });
 
+    describe('when using regular user', () => {
+      it("shouldn't list other user's albums", done => {
+        nock(config.common.api.albumsApiUrl)
+          .get('/albums?id=2')
+          .reply(200, limitedAlbumsResponse, {
+            'Content-Type': 'application/json'
+          });
+        factory.create('User', { mail: 'pedro.jara@wolox.com.ar', type: 'regular' }).then(() => {
+          factory.create('User', { type: 'regular' }).then(user => {
+            factory.create('UserAlbum', { userId: user.id, albumId: 2 }).then(() => {
+              request
+                .get(`/api/v1/users/${user.id}/albums`)
+                .set({
+                  Accept: 'application/json',
+                  authorization:
+                    'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
+                })
+                .then(res => {
+                  expect(res.status).toBe(403);
+                  done();
+                });
+            });
+          });
+        });
+      });
+    });
+
     describe("when user doesn't exist", () => {
       it('should return status 404', done => {
         request

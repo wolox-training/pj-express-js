@@ -7,3 +7,8 @@ exports.buyAlbum = data =>
     logger.error(error);
     throw errors.databaseError(error.message);
   });
+
+exports.getUserAlbums = userId =>
+  UserAlbum.findAll({ where: { userId } }).catch(err => {
+    throw errors.databaseError(err);
+  });
