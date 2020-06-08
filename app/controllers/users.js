@@ -23,7 +23,7 @@ exports.sessions = (req, res, next) =>
     .catch(error => next(error));
 
 exports.getUsers = (req, res, next) => {
-  req.userType = jwt.validate(req.headers.authorization).type;
+  req.userType = jwt.decode(req.headers.authorization).type;
   const page = req.headers.page || 0;
   const limit = req.headers.limit || config.common.api.paginationLimit;
   return usersService
@@ -33,7 +33,7 @@ exports.getUsers = (req, res, next) => {
 };
 
 exports.getUserAlbums = (req, res, next) => {
-  req.userToken = jwt.validate(req.headers.authorization);
+  req.userToken = jwt.decode(req.headers.authorization);
   return usersService
     .getUserAlbums(req.params.id, req.userToken.mail)
     .then(userAlbums => albumsService.albumsBy({ id: userAlbums.map(ua => ua.albumId) }))
