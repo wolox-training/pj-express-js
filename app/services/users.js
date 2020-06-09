@@ -49,6 +49,13 @@ exports.getUsers = async (page, limit, userType) => {
 };
 
 exports.findUserByMail = mail =>
-  User.findOne({ where: { mail } }).catch(error => {
-    throw errors.databaseError(error);
-  });
+  User.findOne({ where: { mail } })
+    .then(user => {
+      if (!user) {
+        throw errors.notFound(`User with mail ${mail} not found`);
+      }
+      return user;
+    })
+    .catch(error => {
+      throw errors.databaseError(error);
+    });

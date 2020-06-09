@@ -8,6 +8,7 @@ exports.validate = async (req, res, next) => {
     const tokenUser = await userService.findUserByMail(req.userToken.mail);
     if (!(user.id === tokenUser.id || tokenUser.type === 'admin')) {
       next(errors.authenticationError(`UserId ${req.params.id} doesn't have the required permission`));
+      return;
     }
     next();
   } catch (err) {

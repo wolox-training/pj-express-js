@@ -5,7 +5,7 @@ const errors = require('../errors');
 exports.buyAlbum = data =>
   UserAlbum.create(data).catch(error => {
     logger.error(error);
-    throw errors.databaseError(error.message);
+    throw errors.conflictError(error.message);
   });
 
 exports.getUserAlbums = userId =>
