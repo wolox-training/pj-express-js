@@ -6,6 +6,7 @@ const converter = require('../helpers/converter');
 const jwt = require('../../app/services/jwt');
 const { config } = require('../../config/testing');
 const authorizationToken = require('../helpers/authorizationTokens');
+const mailMocker = require('../helpers/mailMocker');
 
 const app = require('../../app');
 
@@ -15,6 +16,9 @@ require('../factory/models');
 
 describe('Users Controller', () => {
   describe('/POST users', () => {
+    beforeAll(() => {
+      mailMocker.mockMailSending();
+    });
     describe('when using valid parameters', () => {
       it('should create a new user', done => {
         factory.attrs('User').then(body => {

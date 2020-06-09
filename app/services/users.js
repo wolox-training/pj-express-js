@@ -9,10 +9,7 @@ exports.createUser = data => {
   logger.info('Create User: ', data);
 
   return User.create(data)
-    .then(user => {
-      mailer.sendMail(user);
-      return user;
-    })
+    .then(user => mailer.sendMail(user).then(() => user))
     .catch(error => {
       logger.error(error);
       throw errors.databaseError(error.message);
@@ -77,3 +74,15 @@ exports.invalidateAll = token =>
   User.update({ tokenEmitDate: Date.now() }, { where: { mail: token.mail } }).catch(err => {
     throw errors.databaseError(err);
   });
+
+exports.getUser = id =>
+  User.findByPk(id)
+    .then(user => {
+      if (!user) {
+        throw errors.notFound(`User ${id} not found.`);
+      }
+      return user;
+    })
+    .catch(err => {
+      throw errors.databaseError(err);
+    });
