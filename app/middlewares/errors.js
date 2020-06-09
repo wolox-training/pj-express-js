@@ -6,6 +6,7 @@ const DEFAULT_STATUS_CODE = 500;
 const statusCodes = {
   [errors.DATABASE_ERROR]: 503,
   [errors.DEFAULT_ERROR]: 500,
+  [errors.CONFLICT_ERROR]: 409,
   [errors.EXTERNAL_API_ERROR]: 503,
   [errors.SERVER_ERROR]: 500,
   [errors.INVALID_PARAMS]: 422,

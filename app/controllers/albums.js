@@ -1,4 +1,5 @@
 const albumsService = require('../services/albums');
+const userAlbumsService = require('../services/userAlbums');
 const usersService = require('../services/users');
 
 exports.getAlbums = (req, res, next) =>
@@ -15,8 +16,11 @@ exports.getAlbumPhotos = (req, res, next) =>
 
 exports.buyAlbum = (req, res, next) =>
   usersService
-    .getUser(req.body.user_id)
-    .then(user =>
-      albumsService.buyAlbum({ albumId: req.params.id, userId: user.id }).then(response => res.send(response))
-    )
+    .findUserByMail(req.userToken.mail)
+    .then(user => {
+      userAlbumsService
+        .buyAlbum({ albumId: req.params.id, userId: user.id })
+        .then(response => res.send(response))
+        .catch(error => next(error));
+    })
     .catch(error => next(error));

@@ -7,6 +7,7 @@ const jwt = require('../../app/services/jwt');
 const { config } = require('../../config/testing');
 const authorizationToken = require('../helpers/authorizationTokens');
 const mailMocker = require('../helpers/mailMocker');
+const limitedAlbumsResponse = require('../mocks/limitedAlbumsResponse.json');
 
 const app = require('../../app');
 
@@ -16,8 +17,9 @@ require('../factory/models');
 
 describe('Users Controller', () => {
   describe('/POST users', () => {
-    beforeAll(() => {
-      mailMocker.mockMailSending();
+    let mockedMail = null;
+    beforeEach(() => {
+      mockedMail = mailMocker.mockMailSending();
     });
     describe('when using valid parameters', () => {
       it('should create a new user', done => {
@@ -29,6 +31,7 @@ describe('Users Controller', () => {
             .then(res => {
               expect(res.status).toBe(200);
               expect(res.body.mail).toBe(body.mail);
+              expect(mockedMail).toHaveBeenCalled();
               done();
             });
         });
@@ -45,6 +48,7 @@ describe('Users Controller', () => {
               .set('Accept', 'application/json')
               .then(res => {
                 expect(res.status).toBe(503);
+                expect(mockedMail).not.toHaveBeenCalled();
                 done();
               });
           });
@@ -59,6 +63,7 @@ describe('Users Controller', () => {
             .then(res => {
               expect(res.status).toBe(422);
               expect(res.body.internal_code).toBe('invalid_params');
+              expect(mockedMail).not.toHaveBeenCalled();
               done();
             });
         });
@@ -72,6 +77,7 @@ describe('Users Controller', () => {
             .then(res => {
               expect(res.status).toBe(422);
               expect(res.body.internal_code).toBe('invalid_params');
+              expect(mockedMail).not.toHaveBeenCalled();
               done();
             });
         });
@@ -231,7 +237,7 @@ describe('Users Controller', () => {
             .set({ Accept: 'application/json', authorization: authorizationToken.expiredToken })
             .then(() => {
               expect(
-                jwt.validate(authorizationToken.expiredToken).iat <= Math.round(user.tokenEmitDate / 1000)
+                jwt.decode(authorizationToken.expiredToken).iat <= Math.round(user.tokenEmitDate / 1000)
               ).toBeTruthy();
               done();
             });
@@ -242,7 +248,7 @@ describe('Users Controller', () => {
         it('should keep tokens valid', done => {
           factory.create('User', { mail: 'pedro.jara@wolox.com.ar' }).then(user => {
             expect(
-              jwt.validate(authorizationToken.regularToken).iat > Math.round(user.tokenEmitDate / 1000)
+              jwt.decode(authorizationToken.regularToken).iat > Math.round(user.tokenEmitDate / 1000)
             ).toBeTruthy();
             done();
           });
@@ -256,7 +262,7 @@ describe('Users Controller', () => {
       it("should list all user's albums", done => {
         nock(config.common.api.albumsApiUrl)
           .get('/albums?id=2')
-          .replyWithFile(200, `${process.cwd()}/test/mocks/limitedAlbumsResponse.json`, {
+          .reply(200, limitedAlbumsResponse, {
             'Content-Type': 'application/json'
           });
         factory.create('User', { mail: 'pedro.jara@wolox.com.ar' }).then(user => {
@@ -281,7 +287,7 @@ describe('Users Controller', () => {
       it("should list other user's albums", done => {
         nock(config.common.api.albumsApiUrl)
           .get('/albums?id=2')
-          .replyWithFile(200, `${process.cwd()}/test/mocks/limitedAlbumsResponse.json`, {
+          .reply(200, limitedAlbumsResponse, {
             'Content-Type': 'application/json'
           });
         factory.create('User', { mail: 'pedro.jara@wolox.com.ar', type: 'admin' }).then(() => {
@@ -296,6 +302,33 @@ describe('Users Controller', () => {
                 .then(res => {
                   expect(res.status).toBe(200);
                   expect(res.body[0].id).toBe(2);
+                  done();
+                });
+            });
+          });
+        });
+      });
+    });
+
+    describe('when using regular user', () => {
+      it("shouldn't list other user's albums", done => {
+        nock(config.common.api.albumsApiUrl)
+          .get('/albums?id=2')
+          .reply(200, limitedAlbumsResponse, {
+            'Content-Type': 'application/json'
+          });
+        factory.create('User', { mail: 'pedro.jara@wolox.com.ar', type: 'regular' }).then(() => {
+          factory.create('User', { type: 'regular' }).then(user => {
+            factory.create('UserAlbum', { userId: user.id, albumId: 2 }).then(() => {
+              request
+                .get(`/api/v1/users/${user.id}/albums`)
+                .set({
+                  Accept: 'application/json',
+                  authorization:
+                    'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
+                })
+                .then(res => {
+                  expect(res.status).toBe(403);
                   done();
                 });
             });

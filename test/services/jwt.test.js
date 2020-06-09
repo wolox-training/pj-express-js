@@ -10,7 +10,7 @@ describe('JWT Service', () => {
       it('the token should be invalid', done => {
         const token = jwt.authorizationToken({ mail: 'pedro.jara@wolox.com.ar', type: 'regular' });
         mockDate.set('2020-06-04');
-        expect(() => jwt.validate(token)).toThrow();
+        expect(() => jwt.decode(token)).toThrow();
         done();
       });
     });
@@ -18,7 +18,7 @@ describe('JWT Service', () => {
     describe("when expiry time hasn't passed", () => {
       it('the token should be valid', done => {
         const token = jwt.authorizationToken('pedro.jara@wolox.com.ar');
-        expect(jwt.validate(token)).toBeDefined();
+        expect(jwt.decode(token)).toBeDefined();
         done();
       });
     });

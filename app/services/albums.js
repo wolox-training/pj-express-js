@@ -3,7 +3,6 @@ const querystring = require('querystring');
 const logger = require('../logger');
 const errors = require('../errors');
 const config = require('../../config');
-const { UserAlbum } = require('../models');
 
 const options = {
   uri: config.common.api.albumsApiUrl,
@@ -29,19 +28,5 @@ exports.getAlbums = (queryParams = {}) =>
 
 exports.getPhotos = (queryParams = {}) =>
   get(`${options.uri}/photos${queryString(queryParams)}`).then(response => response.data);
-
-exports.buyAlbum = async data => {
-  logger.info('Create UserAlbum: ', data);
-  const albums = await this.getAlbums({ id: data.albumId });
-  logger.info('Albums:', albums);
-  if (albums.length === 0) {
-    throw errors.notFound(`Album with Id: ${data.albumId} doesn't exist`);
-  }
-
-  return UserAlbum.create(data).catch(error => {
-    logger.error(error);
-    throw errors.databaseError(error.message);
-  });
-};
 
 exports.albumsBy = filter => this.getAlbums(filter);
