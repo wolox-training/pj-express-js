@@ -9,9 +9,5 @@ exports.buyAlbum = {
   authorization: {
     in: ['headers'],
     exists: true
-  },
-  user_id: {
-    in: ['body'],
-    exists: true
   }
 };

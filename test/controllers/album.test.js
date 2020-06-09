@@ -130,9 +130,6 @@ describe('Albums Controller', () => {
         factory.create('User', { mail: 'pedro.jara@wolox.com.ar' }).then(user => {
           request
             .post('/api/v1/albums/1')
-            .send({
-              user_id: user.id
-            })
             .set({
               Accept: 'application/json',
               authorization:
@@ -156,19 +153,16 @@ describe('Albums Controller', () => {
             .reply(200, oneAlbumResponse, {
               'Content-Type': 'application/json'
             });
-          factory.create('User', { mail: 'pedro.jara@wolox.com.ar' }).then(user => {
+          factory.create('User', { mail: 'pedro.jara@wolox.com.ar' }).then(() => {
             request
               .post('/api/v1/albums/1')
-              .send({
-                user_id: user.id
-              })
               .set({
                 Accept: 'application/json',
                 authorization:
                   'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
               })
               .then(response => {
-                expect(response.status).toBe(503);
+                expect(response.status).toBe(409);
                 done();
               });
           });
@@ -181,9 +175,6 @@ describe('Albums Controller', () => {
         factory.create('UserAlbum', { albumId: 1 }).then(() => {
           request
             .post('/api/v1/albums/1')
-            .send({
-              user_id: 0
-            })
             .set({
               Accept: 'application/json',
               authorization:
@@ -204,12 +195,9 @@ describe('Albums Controller', () => {
           .reply(200, [], {
             'Content-Type': 'application/json'
           });
-        factory.create('User', { mail: 'pedro.jara@wolox.com.ar' }).then(user => {
+        factory.create('User', { mail: 'pedro.jara@wolox.com.ar' }).then(() => {
           request
             .post('/api/v1/albums/0')
-            .send({
-              user_id: user.id
-            })
             .set({
               Accept: 'application/json',
               authorization:
