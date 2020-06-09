@@ -51,22 +51,6 @@ describe('Albums Controller', () => {
           });
       });
     });
-
-    describe('when the authorization token doesnt match the user', () => {
-      it('should respond with an error', done => {
-        request
-          .get('/api/v1/albums')
-          .set({
-            Accept: 'application/json',
-            authorization:
-              'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcaaaa'
-          })
-          .then(response => {
-            expect(response.status).toBe(403);
-            done();
-          });
-      });
-    });
   });
 
   describe('/GET albums/:id/photos', () => {
@@ -105,22 +89,6 @@ describe('Albums Controller', () => {
     });
   });
 
-  describe("when the authorization token doesn't match the user", () => {
-    it('should respond with an error', done => {
-      request
-        .get('/api/v1/albums/1/photos')
-        .set({
-          Accept: 'application/json',
-          authorization:
-            'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQaaaaa'
-        })
-        .then(response => {
-          expect(response.status).toBe(403);
-          done();
-        });
-    });
-  });
-
   describe('/POST albums/:id', () => {
     describe('when using valid parameters', () => {
       it('should buy an album', done => {
@@ -131,9 +99,6 @@ describe('Albums Controller', () => {
           });
         request
           .post('/api/v1/albums/1')
-          .send({
-            user_id: 1
-          })
           .set({
             Accept: 'application/json',
             authorization: authorizationTokens.regularToken
@@ -157,15 +122,12 @@ describe('Albums Controller', () => {
             });
           request
             .post('/api/v1/albums/1')
-            .send({
-              user_id: 1
-            })
             .set({
               Accept: 'application/json',
               authorization: authorizationTokens.regularToken
             })
             .then(response => {
-              expect(response.status).toBe(503);
+              expect(response.status).toBe(409);
               done();
             });
         });
@@ -177,15 +139,12 @@ describe('Albums Controller', () => {
         factory.create('UserAlbum', { albumId: 1 }).then(() => {
           request
             .post('/api/v1/albums/1')
-            .send({
-              user_id: 0
-            })
             .set({
               Accept: 'application/json',
               authorization: authorizationTokens.regularToken
             })
             .then(response => {
-              expect(response.status).toBe(503);
+              expect(response.status).toBe(409);
               done();
             });
         });
@@ -201,9 +160,6 @@ describe('Albums Controller', () => {
           });
         request
           .post('/api/v1/albums/0')
-          .send({
-            user_id: 1
-          })
           .set({
             Accept: 'application/json',
             authorization: authorizationTokens.regularToken

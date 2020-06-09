@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const errors = require('../errors');
 const logger = require('../logger');
-const { User, UserAlbum } = require('../models');
+const { User } = require('../models');
 const jwt = require('./jwt');
 
 exports.createUser = data => {
@@ -49,25 +49,18 @@ exports.getUsers = async (page, limit, userType) => {
 };
 
 exports.findUserByMail = mail =>
-  User.findOne({ where: { mail } }).catch(error => {
-    throw errors.databaseError(error);
-  });
-
-exports.getUserAlbums = async (userId, tokenMail) => {
-  logger.info(`Index UserId: ${userId}'s Albums`);
-  const user = await User.findByPk(userId);
-  const tokenUser = await this.findUserByMail(tokenMail);
-  if (!user) throw errors.notFound(`User with Id ${userId} not found`);
-  if (!(user.id === tokenUser.id || tokenUser.type === 'admin')) {
-    throw errors.authenticationError(`UserId ${userId} doesn't have the required permission`);
-  }
-  const userAlbums = await UserAlbum.findAll({ where: { userId } }).catch(err => {
-    throw errors.databaseError(err);
-  });
-  return userAlbums;
-};
+  User.findOne({ where: { mail } })
+    .then(user => {
+      if (!user) {
+        throw errors.notFound(`User with mail ${mail} not found`);
+      }
+      return user;
+    })
+    .catch(error => {
+      throw errors.databaseError(error);
+    });
 
 exports.invalidateAll = token =>
-  User.update({ tokenEmiteDate: Date.now() }, { where: { mail: token.mail } }).catch(err => {
+  User.update({ tokenEmitDate: Date.now() }, { where: { mail: token.mail } }).catch(err => {
     throw errors.databaseError(err);
   });

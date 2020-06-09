@@ -26,3 +26,6 @@ exports.hashError = message => internalError(message, exports.HASH_ERROR);
 
 exports.NOT_FOUND = 'not_found';
 exports.notFound = message => internalError(message, exports.NOT_FOUND);
+
+exports.CONFLICT_ERROR = 'conflict_error';
+exports.conflictError = message => internalError(message, exports.CONFLICT_ERROR);

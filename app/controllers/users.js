@@ -1,5 +1,6 @@
 const usersService = require('../services/users');
 const albumsService = require('../services/albums');
+const userAlbumsService = require('../services/userAlbums');
 const userMapper = require('../mappers/user');
 const bcrypt = require('../services/bcrypt');
 const jwt = require('../services/jwt');
@@ -23,7 +24,7 @@ exports.sessions = (req, res, next) =>
     .catch(error => next(error));
 
 exports.getUsers = (req, res, next) => {
-  req.userType = jwt.validate(req.headers.authorization).type;
+  req.userType = jwt.decode(req.headers.authorization).type;
   const page = req.headers.page || 0;
   const limit = req.headers.limit || config.common.api.paginationLimit;
   return usersService
@@ -34,16 +35,14 @@ exports.getUsers = (req, res, next) => {
 
 exports.invalidateAll = (req, res, next) => {
   usersService
-    .invalidateAll(jwt.validate(req.headers.authorization))
+    .invalidateAll(jwt.decode(req.headers.authorization))
     .then(() => res.sendStatus(200))
     .catch(error => next(error));
 };
 
-exports.getUserAlbums = (req, res, next) => {
-  req.userToken = jwt.validate(req.headers.authorization);
-  return usersService
-    .getUserAlbums(req.params.id, req.userToken.mail)
+exports.getUserAlbums = (req, res, next) =>
+  userAlbumsService
+    .getUserAlbums(req.params.id)
     .then(userAlbums => albumsService.albumsBy({ id: userAlbums.map(ua => ua.albumId) }))
     .then(albums => res.send(albums))
     .catch(error => next(error));
-};
