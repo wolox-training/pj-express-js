@@ -46,7 +46,7 @@ exports.init = app => {
   );
   app.post(
     `${URL}/users/sessions/invalidate_all`,
-    paramsValidator.validateSchemaAndFail(schemas.users.invalidateAll),
+    [paramsValidator.validateSchemaAndFail(schemas.users.invalidateAll), userTokenMiddleware.updateReq],
     usersController.invalidateAll
   );
   app.get(
