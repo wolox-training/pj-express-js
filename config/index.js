@@ -36,7 +36,8 @@ const config = {
       port: process.env.PORT,
       albumsApiUrl: process.env.ALBUMS_API_URL,
       jwtSecret: process.env.JWT_SECRET,
-      paginationLimit: process.env.PAGINATION_LIMIT
+      paginationLimit: process.env.PAGINATION_LIMIT,
+      tokenExpireSeconds: process.env.TOKEN_EXPIRE_SECONDS || 3600
     },
     session: {
       header_name: 'authorization',

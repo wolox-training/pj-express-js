@@ -4,7 +4,7 @@ const usersService = require('../../services/users');
 
 exports.validate = (req, res, next) => {
   try {
-    const token = jwt.validate(req.headers.authorization);
+    const token = jwt.decode(req.headers.authorization);
     req.userToken = token;
   } catch (err) {
     next(errors.authenticationError(err));

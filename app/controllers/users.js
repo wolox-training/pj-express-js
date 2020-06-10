@@ -24,7 +24,7 @@ exports.sessions = (req, res, next) =>
     .catch(error => next(error));
 
 exports.getUsers = (req, res, next) => {
-  req.userType = jwt.validate(req.headers.authorization).type;
+  req.userType = jwt.decode(req.headers.authorization).type;
   const page = req.headers.page || 0;
   const limit = req.headers.limit || config.common.api.paginationLimit;
   return usersService
