@@ -13,6 +13,9 @@ require('../factory/models');
 
 describe('Albums Controller', () => {
   describe('/GET albums', () => {
+    beforeAll(() => {
+      factory.create('User', { mail: 'pedro.jara@wolox.com.ar' });
+    });
     describe('when using valid parameters', () => {
       it('should respond with albums information', done => {
         nock(config.common.api.albumsApiUrl)
@@ -67,6 +70,9 @@ describe('Albums Controller', () => {
   });
 
   describe('/GET albums/:id/photos', () => {
+    beforeAll(() => {
+      factory.create('User', { mail: 'pedro.jara@wolox.com.ar' });
+    });
     describe('when using valid parameters', () => {
       it('should respond with photos information', done => {
         nock(config.common.api.albumsApiUrl)
@@ -120,6 +126,7 @@ describe('Albums Controller', () => {
   });
 
   describe('/POST albums/:id', () => {
+    beforeEach(() => factory.create('User', { mail: 'pedro.jara@wolox.com.ar' }));
     describe('when using valid parameters', () => {
       it('should buy an album', done => {
         nock(config.common.api.albumsApiUrl)
@@ -127,7 +134,30 @@ describe('Albums Controller', () => {
           .reply(200, oneAlbumResponse, {
             'Content-Type': 'application/json'
           });
-        factory.create('User', { mail: 'pedro.jara@wolox.com.ar' }).then(user => {
+        request
+          .post('/api/v1/albums/1')
+          .set({
+            Accept: 'application/json',
+            authorization:
+              'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
+          })
+          .then(response => {
+            expect(response.status).toBe(200);
+            expect(response.body.albumId).toBe(1);
+            expect(response.body.userId).toBe(1);
+            done();
+          });
+      });
+    });
+
+    describe('when trying to buy twice the same album', () => {
+      it('should respond with error', done => {
+        factory.create('UserAlbum', { albumId: 1, userId: 1 }).then(() => {
+          nock(config.common.api.albumsApiUrl)
+            .get('/albums?id=1')
+            .reply(200, oneAlbumResponse, {
+              'Content-Type': 'application/json'
+            });
           request
             .post('/api/v1/albums/1')
             .set({
@@ -136,36 +166,9 @@ describe('Albums Controller', () => {
                 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
             })
             .then(response => {
-              expect(response.status).toBe(200);
-              expect(response.body.albumId).toBe(1);
-              expect(response.body.userId).toBe(user.id);
+              expect(response.status).toBe(409);
               done();
             });
-        });
-      });
-    });
-
-    describe('when trying to buy twice the same album', () => {
-      it('should respond with error', done => {
-        factory.create('UserAlbum', { albumId: 1 }).then(() => {
-          nock(config.common.api.albumsApiUrl)
-            .get('/albums?id=1')
-            .reply(200, oneAlbumResponse, {
-              'Content-Type': 'application/json'
-            });
-          factory.create('User', { mail: 'pedro.jara@wolox.com.ar' }).then(() => {
-            request
-              .post('/api/v1/albums/1')
-              .set({
-                Accept: 'application/json',
-                authorization:
-                  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
-              })
-              .then(response => {
-                expect(response.status).toBe(409);
-                done();
-              });
-          });
         });
       });
     });
@@ -173,15 +176,20 @@ describe('Albums Controller', () => {
     describe("when user doesn't exist", () => {
       it('should respond with error', done => {
         factory.create('UserAlbum', { albumId: 1 }).then(() => {
+          nock(config.common.api.albumsApiUrl)
+            .get('/albums?id=1')
+            .reply(200, oneAlbumResponse, {
+              'Content-Type': 'application/json'
+            });
           request
             .post('/api/v1/albums/1')
             .set({
               Accept: 'application/json',
               authorization:
-                'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
+                'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoiaG9sYUB3b2xveC5jb20uYXIiLCJ0eXBlIjoicmVndWxhciJ9.TI8DHOBIlqe0mm7Jzsw8NZVwBuVT1G4zOGHIYOhtto0'
             })
             .then(response => {
-              expect(response.status).toBe(503);
+              expect(response.status).toBe(404);
               done();
             });
         });
@@ -195,19 +203,17 @@ describe('Albums Controller', () => {
           .reply(200, [], {
             'Content-Type': 'application/json'
           });
-        factory.create('User', { mail: 'pedro.jara@wolox.com.ar' }).then(() => {
-          request
-            .post('/api/v1/albums/0')
-            .set({
-              Accept: 'application/json',
-              authorization:
-                'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
-            })
-            .then(response => {
-              expect(response.status).toBe(404);
-              done();
-            });
-        });
+        request
+          .post('/api/v1/albums/0')
+          .set({
+            Accept: 'application/json',
+            authorization:
+              'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
+          })
+          .then(response => {
+            expect(response.status).toBe(404);
+            done();
+          });
       });
     });
   });

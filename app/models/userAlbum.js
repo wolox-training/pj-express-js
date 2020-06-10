@@ -2,7 +2,7 @@ module.exports = (sequelize, DataTypes) => {
   const UserAlbum = sequelize.define(
     'UserAlbum',
     {
-      albumId: { type: DataTypes.INTEGER, allowNull: false, unique: true },
+      albumId: { type: DataTypes.INTEGER, allowNull: false },
       userId: { type: DataTypes.INTEGER, allowNull: false }
     },
     {
