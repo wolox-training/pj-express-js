@@ -28,3 +28,5 @@ exports.getAlbums = (queryParams = {}) =>
 
 exports.getPhotos = (queryParams = {}) =>
   get(`${options.uri}/photos${queryString(queryParams)}`).then(response => response.data);
+
+exports.albumsBy = filter => this.getAlbums(filter);

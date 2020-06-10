@@ -1,13 +1,17 @@
+/* eslint-disable max-lines */
 const supertest = require('supertest');
 const { factory } = require('factory-girl');
+const nock = require('nock');
 const converter = require('../helpers/converter');
+const { config } = require('../../config/testing');
 const authorizationToken = require('../helpers/authorizationTokens');
+const limitedAlbumsResponse = require('../mocks/limitedAlbumsResponse.json');
 
 const app = require('../../app');
 
 const request = supertest(app);
 
-require('../factory/user');
+require('../factory/models');
 
 describe('Users Controller', () => {
   describe('/POST users', () => {
@@ -210,6 +214,119 @@ describe('Users Controller', () => {
               });
           });
         });
+      });
+    });
+  });
+
+  describe('/GET users/:id/albums', () => {
+    describe('when using valid params', () => {
+      it("should list all user's albums", done => {
+        nock(config.common.api.albumsApiUrl)
+          .get('/albums?id=2')
+          .reply(200, limitedAlbumsResponse, {
+            'Content-Type': 'application/json'
+          });
+        factory.create('User', { mail: 'pedro.jara@wolox.com.ar' }).then(user => {
+          factory.create('UserAlbum', { userId: user.id, albumId: 2 }).then(() => {
+            request
+              .get(`/api/v1/users/${user.id}/albums`)
+              .set({
+                Accept: 'application/json',
+                authorization:
+                  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
+              })
+              .then(res => {
+                expect(res.status).toBe(200);
+                expect(res.body[0].id).toBe(2);
+                done();
+              });
+          });
+        });
+      });
+    });
+
+    describe('when using admin user', () => {
+      it("should list other user's albums", done => {
+        nock(config.common.api.albumsApiUrl)
+          .get('/albums?id=2')
+          .reply(200, limitedAlbumsResponse, {
+            'Content-Type': 'application/json'
+          });
+        factory.create('User', { mail: 'pedro.jara@wolox.com.ar', type: 'admin' }).then(() => {
+          factory.create('User', { type: 'regular' }).then(user => {
+            factory.create('UserAlbum', { userId: user.id, albumId: 2 }).then(() => {
+              request
+                .get(`/api/v1/users/${user.id}/albums`)
+                .set({
+                  Accept: 'application/json',
+                  authorization:
+                    'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
+                })
+                .then(res => {
+                  expect(res.status).toBe(200);
+                  expect(res.body[0].id).toBe(2);
+                  done();
+                });
+            });
+          });
+        });
+      });
+    });
+
+    describe('when using regular user', () => {
+      it("shouldn't list other user's albums", done => {
+        nock(config.common.api.albumsApiUrl)
+          .get('/albums?id=2')
+          .reply(200, limitedAlbumsResponse, {
+            'Content-Type': 'application/json'
+          });
+        factory.create('User', { mail: 'pedro.jara@wolox.com.ar', type: 'regular' }).then(() => {
+          factory.create('User', { type: 'regular' }).then(user => {
+            factory.create('UserAlbum', { userId: user.id, albumId: 2 }).then(() => {
+              request
+                .get(`/api/v1/users/${user.id}/albums`)
+                .set({
+                  Accept: 'application/json',
+                  authorization:
+                    'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
+                })
+                .then(res => {
+                  expect(res.status).toBe(403);
+                  done();
+                });
+            });
+          });
+        });
+      });
+    });
+
+    describe("when user doesn't exist", () => {
+      it('should return status 404', done => {
+        request
+          .get('/api/v1/users/1/albums')
+          .set({
+            Accept: 'application/json',
+            authorization:
+              'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
+          })
+          .then(res => {
+            expect(res.status).toBe(404);
+            done();
+          });
+      });
+    });
+
+    describe('when there is no authorization header', () => {
+      it('should return status 422', done => {
+        request
+          .get('/api/v1/users/1/albums')
+          .set({
+            Accept: 'application/json'
+          })
+          .then(res => {
+            expect(res.status).toBe(422);
+            done();
+          });
       });
     });
   });

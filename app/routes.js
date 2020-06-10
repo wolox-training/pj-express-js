@@ -6,6 +6,8 @@ const paramsValidator = require('./middlewares/validators/paramsValidator');
 const schemas = require('./schemas');
 const authorizationValidator = require('./middlewares/validators/authorizationValidator');
 const adminValidator = require('./middlewares/validators/adminValidator');
+const permissionsValidator = require('./middlewares/validators/permissionsValidator');
+const buyAlbumValidator = require('./middlewares/validators/buyAlbumValidator');
 
 const URL = '/api/v1';
 
@@ -15,6 +17,15 @@ exports.init = app => {
     `${URL}/users`,
     paramsValidator.validateSchemaAndFail(schemas.users.create),
     usersController.create
+  );
+  app.get(
+    `${URL}/users/:id/albums`,
+    [
+      paramsValidator.validateSchemaAndFail(schemas.users.indexUserAlbums),
+      authorizationValidator.validate,
+      permissionsValidator.validate
+    ],
+    usersController.getUserAlbums
   );
   app.get(
     `${URL}/users`,
@@ -35,6 +46,15 @@ exports.init = app => {
     `${URL}/albums`,
     [paramsValidator.validateSchemaAndFail(schemas.albums.authorization), authorizationValidator.validate],
     albumsController.getAlbums
+  );
+  app.post(
+    `${URL}/albums/:id`,
+    [
+      paramsValidator.validateSchemaAndFail(schemas.albums.buyAlbum),
+      authorizationValidator.validate,
+      buyAlbumValidator.validate
+    ],
+    albumsController.buyAlbum
   );
   app.get(
     `${URL}/albums/:id/photos`,

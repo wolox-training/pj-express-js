@@ -43,3 +43,10 @@ exports.index = {
     exists: true
   }
 };
+
+exports.indexUserAlbums = {
+  authorization: {
+    in: ['headers'],
+    exists: true
+  }
+};

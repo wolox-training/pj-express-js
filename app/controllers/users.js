@@ -1,4 +1,6 @@
 const usersService = require('../services/users');
+const albumsService = require('../services/albums');
+const userAlbumsService = require('../services/userAlbums');
 const userMapper = require('../mappers/user');
 const bcrypt = require('../services/bcrypt');
 const jwt = require('../services/jwt');
@@ -30,3 +32,10 @@ exports.getUsers = (req, res, next) => {
     .then(users => res.send(users))
     .catch(error => next(error));
 };
+
+exports.getUserAlbums = (req, res, next) =>
+  userAlbumsService
+    .getUserAlbums(req.params.id)
+    .then(userAlbums => albumsService.albumsBy({ id: userAlbums.map(ua => ua.albumId) }))
+    .then(albums => res.send(albums))
+    .catch(error => next(error));
