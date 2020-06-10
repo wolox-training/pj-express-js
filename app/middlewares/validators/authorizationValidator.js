@@ -1,11 +1,22 @@
 const jwt = require('../../services/jwt');
 const errors = require('../../errors');
+const usersService = require('../../services/users');
 
 exports.validate = (req, res, next) => {
   try {
-    jwt.validate(req.headers.authorization);
-    next();
+    const token = jwt.validate(req.headers.authorization);
+    req.userToken = token;
   } catch (err) {
     next(errors.authenticationError(err));
+    return;
   }
+  usersService
+    .findUserByMail(req.userToken.mail)
+    .then(user => {
+      req.user = user.dataValues;
+      next();
+    })
+    .catch(err => {
+      next(errors.notFound(err));
+    });
 };
