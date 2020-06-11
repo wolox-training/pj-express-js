@@ -10,7 +10,6 @@ module.exports = {
       },
       album_id: {
         allowNull: false,
-        unique: true,
         type: Sequelize.INTEGER
       },
       user_id: {

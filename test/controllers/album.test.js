@@ -114,7 +114,7 @@ describe('Albums Controller', () => {
 
     describe('when trying to buy twice the same album', () => {
       it('should respond with error', done => {
-        factory.create('UserAlbum', { albumId: 1 }).then(() => {
+        factory.create('UserAlbum', { albumId: 1, userId: 1 }).then(() => {
           nock(config.common.api.albumsApiUrl)
             .get('/albums?id=1')
             .reply(200, oneAlbumResponse, {
@@ -137,14 +137,19 @@ describe('Albums Controller', () => {
     describe("when user doesn't exist", () => {
       it('should respond with error', done => {
         factory.create('UserAlbum', { albumId: 1 }).then(() => {
+          nock(config.common.api.albumsApiUrl)
+            .get('/albums?id=1')
+            .reply(200, oneAlbumResponse, {
+              'Content-Type': 'application/json'
+            });
           request
             .post('/api/v1/albums/1')
             .set({
               Accept: 'application/json',
-              authorization: authorizationTokens.regularToken
+              authorization: authorizationTokens.differentUserToken
             })
             .then(response => {
-              expect(response.status).toBe(409);
+              expect(response.status).toBe(404);
               done();
             });
         });
