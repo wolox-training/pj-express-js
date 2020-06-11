@@ -3,6 +3,7 @@ const supertest = require('supertest');
 const { factory } = require('factory-girl');
 const nock = require('nock');
 const converter = require('../helpers/converter');
+const jwt = require('../../app/services/jwt');
 const { config } = require('../../config/testing');
 const authorizationToken = require('../helpers/authorizationTokens');
 const limitedAlbumsResponse = require('../mocks/limitedAlbumsResponse.json');
@@ -218,6 +219,35 @@ describe('Users Controller', () => {
     });
   });
 
+  describe('/POST users/sessions/invalidate_all', () => {
+    describe('when using valid parameters', () => {
+      it('should invalidate all session tokens', done => {
+        factory.create('User', { mail: 'pedro.jara@wolox.com.ar' }).then(user => {
+          request
+            .post('/api/v1/users/sessions/invalidate_all')
+            .set({ Accept: 'application/json', authorization: authorizationToken.expiredToken })
+            .then(() => {
+              expect(
+                jwt.decode(authorizationToken.expiredToken).iat <= Math.round(user.tokenEmitDate / 1000)
+              ).toBeTruthy();
+              done();
+            });
+        });
+      });
+
+      describe("when sessions aren't invalidated", () => {
+        it('should keep tokens valid', done => {
+          factory.create('User', { mail: 'pedro.jara@wolox.com.ar' }).then(user => {
+            expect(
+              jwt.decode(authorizationToken.regularToken).iat > Math.round(user.tokenEmitDate / 1000)
+            ).toBeTruthy();
+            done();
+          });
+        });
+      });
+    });
+  });
+
   describe('/GET users/:id/albums', () => {
     describe('when using valid params', () => {
       it("should list all user's albums", done => {
@@ -232,8 +262,7 @@ describe('Users Controller', () => {
               .get(`/api/v1/users/${user.id}/albums`)
               .set({
                 Accept: 'application/json',
-                authorization:
-                  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
+                authorization: authorizationToken.regularToken
               })
               .then(res => {
                 expect(res.status).toBe(200);
@@ -259,8 +288,7 @@ describe('Users Controller', () => {
                 .get(`/api/v1/users/${user.id}/albums`)
                 .set({
                   Accept: 'application/json',
-                  authorization:
-                    'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
+                  authorization: authorizationToken.adminToken
                 })
                 .then(res => {
                   expect(res.status).toBe(200);
@@ -302,17 +330,18 @@ describe('Users Controller', () => {
 
     describe("when user doesn't exist", () => {
       it('should return status 404', done => {
-        request
-          .get('/api/v1/users/1/albums')
-          .set({
-            Accept: 'application/json',
-            authorization:
-              'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtYWlsIjoicGVkcm8uamFyYUB3b2xveC5jb20uYXIifQ.zLLy2i25xQZuXyk0s98afCQA4hlomRq92D1lZQcP-mE'
-          })
-          .then(res => {
-            expect(res.status).toBe(404);
-            done();
-          });
+        factory.create('User', { mail: 'pedro.jara@wolox.com.ar', type: 'admin' }).then(() => {
+          request
+            .get('/api/v1/users/0/albums')
+            .set({
+              Accept: 'application/json',
+              authorization: authorizationToken.adminToken
+            })
+            .then(res => {
+              expect(res.status).toBe(404);
+              done();
+            });
+        });
       });
     });
 

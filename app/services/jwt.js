@@ -5,7 +5,12 @@ exports.authorizationToken = user => {
   const currentTime = Date.now() / 1000;
   const expireTime = Number(config.common.api.tokenExpireSeconds);
   return jwt.encode(
-    { mail: user.mail, type: user.type, exp: Math.floor(currentTime + expireTime) },
+    {
+      mail: user.mail,
+      type: user.type,
+      exp: Math.floor(currentTime + expireTime),
+      iat: Math.floor(currentTime)
+    },
     config.common.api.jwtSecret
   );
 };

@@ -44,6 +44,13 @@ exports.index = {
   }
 };
 
+exports.invalidateAll = {
+  authorization: {
+    in: ['headers'],
+    exists: true
+  }
+};
+
 exports.indexUserAlbums = {
   authorization: {
     in: ['headers'],

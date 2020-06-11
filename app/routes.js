@@ -34,13 +34,18 @@ exports.init = app => {
   );
   app.post(
     `${URL}/admin/users`,
-    [paramsValidator.validateSchemaAndFail(schemas.admins.create), adminValidator.validateAdmin],
+    [paramsValidator.validateSchemaAndFail(schemas.admins.create), adminValidator.validate],
     adminsController.create
   );
   app.post(
     `${URL}/users/sessions`,
     paramsValidator.validateSchemaAndFail(schemas.users.sessions),
     usersController.sessions
+  );
+  app.post(
+    `${URL}/users/sessions/invalidate_all`,
+    [paramsValidator.validateSchemaAndFail(schemas.users.invalidateAll), authorizationValidator.validate],
+    usersController.invalidateAll
   );
   app.get(
     `${URL}/albums`,

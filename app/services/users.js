@@ -59,3 +59,8 @@ exports.findUserByMail = mail =>
     .catch(error => {
       throw errors.databaseError(error);
     });
+
+exports.invalidateAll = token =>
+  User.update({ tokenEmitDate: Date.now() }, { where: { mail: token.mail } }).catch(err => {
+    throw errors.databaseError(err);
+  });

@@ -1,10 +1,17 @@
 const errors = require('../../errors');
 const jwt = require('../../services/jwt');
+const userService = require('../../services/users');
 
-exports.validateAdmin = (req, res, next) => {
+exports.validate = async (req, res, next) => {
   try {
-    if (jwt.decode(req.headers.authorization).type !== 'admin') {
-      next(errors.authenticationError('User is not an Admin'));
+    const token = jwt.decode(req.headers.authorization);
+    const user = await userService.findUserByMail(token.mail);
+    if (user.tokenEmitDate / 1000 > token.iat) {
+      next(errors.authenticationError('User Token has expired.'));
+      return;
+    }
+    if (user.type !== 'admin') {
+      next(errors.authenticationError("User doesn't have the required Admin Permissions"));
       return;
     }
     next();

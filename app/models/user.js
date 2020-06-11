@@ -17,6 +17,11 @@ module.exports = (sequelize, DataTypes) => {
       type: {
         type: DataTypes.ENUM(userTypes),
         defaultValue: 'regular'
+      },
+      tokenEmitDate: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: sequelize.fn('NOW')
       }
     },
     {

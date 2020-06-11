@@ -33,6 +33,13 @@ exports.getUsers = (req, res, next) => {
     .catch(error => next(error));
 };
 
+exports.invalidateAll = (req, res, next) => {
+  usersService
+    .invalidateAll(req.userToken)
+    .then(() => res.sendStatus(200))
+    .catch(error => next(error));
+};
+
 exports.getUserAlbums = (req, res, next) =>
   userAlbumsService
     .getUserAlbums(req.params.id)

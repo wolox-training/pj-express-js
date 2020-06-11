@@ -13,8 +13,12 @@ exports.validate = (req, res, next) => {
   usersService
     .findUserByMail(req.userToken.mail)
     .then(user => {
-      req.user = user.dataValues;
-      next();
+      if (user.tokenEmitDate / 1000 <= req.userToken.iat) {
+        req.user = user.dataValues;
+        next();
+        return;
+      }
+      next(errors.authenticationError('User Token has expired.'));
     })
     .catch(err => {
       next(errors.notFound(err));
