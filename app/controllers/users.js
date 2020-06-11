@@ -5,13 +5,14 @@ const userMapper = require('../mappers/user');
 const bcrypt = require('../services/bcrypt');
 const jwt = require('../services/jwt');
 const config = require('../../config');
+const mailer = require('../services/mailer');
 
 exports.create = (req, res, next) =>
   bcrypt
     .crypt(req.body.password)
     .then(hash => userMapper.create(req.body, hash))
     .then(mapped_body => usersService.createUser(mapped_body))
-    .then(user => res.send(user))
+    .then(user => mailer.sendMail(user).then(() => res.send(user)))
     .catch(error => next(error));
 
 exports.sessions = (req, res, next) =>

@@ -6,6 +6,7 @@ const converter = require('../helpers/converter');
 const jwt = require('../../app/services/jwt');
 const { config } = require('../../config/testing');
 const authorizationToken = require('../helpers/authorizationTokens');
+const mailMocker = require('../helpers/mailMocker');
 const limitedAlbumsResponse = require('../mocks/limitedAlbumsResponse.json');
 
 const app = require('../../app');
@@ -16,6 +17,10 @@ require('../factory/models');
 
 describe('Users Controller', () => {
   describe('/POST users', () => {
+    let mockedMail = null;
+    beforeEach(() => {
+      mockedMail = mailMocker.mockMailSending();
+    });
     describe('when using valid parameters', () => {
       it('should create a new user', done => {
         factory.attrs('User').then(body => {
@@ -26,6 +31,7 @@ describe('Users Controller', () => {
             .then(res => {
               expect(res.status).toBe(200);
               expect(res.body.mail).toBe(body.mail);
+              expect(mockedMail).toHaveBeenCalled();
               done();
             });
         });
@@ -42,6 +48,7 @@ describe('Users Controller', () => {
               .set('Accept', 'application/json')
               .then(res => {
                 expect(res.status).toBe(503);
+                expect(mockedMail).not.toHaveBeenCalled();
                 done();
               });
           });
@@ -56,6 +63,7 @@ describe('Users Controller', () => {
             .then(res => {
               expect(res.status).toBe(422);
               expect(res.body.internal_code).toBe('invalid_params');
+              expect(mockedMail).not.toHaveBeenCalled();
               done();
             });
         });
@@ -69,6 +77,7 @@ describe('Users Controller', () => {
             .then(res => {
               expect(res.status).toBe(422);
               expect(res.body.internal_code).toBe('invalid_params');
+              expect(mockedMail).not.toHaveBeenCalled();
               done();
             });
         });
